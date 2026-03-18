@@ -386,6 +386,14 @@ internal static class OzmiumWriteHandlers
 			return Enum.Parse( targetType, str, ignoreCase: true );
 		}
 
+		// Handle Sandbox.Model (e.g. for SkinnedModelRenderer.Model, ModelRenderer.Model)
+		if ( targetType == typeof( Model ) )
+		{
+			var path = el.ValueKind == JsonValueKind.String ? el.GetString() : el.GetRawText();
+			if ( string.IsNullOrEmpty( path ) || path == "null" ) return null;
+			return Model.Load( path );
+		}
+
 		if ( typeof( Component ).IsAssignableFrom( targetType ) )
 		{
 			string guidStr = null;
