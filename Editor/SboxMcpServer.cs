@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -35,6 +36,9 @@ public static class McpServer
 	private static HttpListener _listener;
 	private static CancellationTokenSource _cts;
 	private static readonly ConcurrentDictionary<string, McpSession> _sessions = new();
+
+	// Tracks in-flight RPC tasks so StopServer can wait for them to finish
+	private static readonly ConcurrentDictionary<Guid, Task> _inflightTasks = new();
 
 	internal static readonly JsonSerializerOptions JsonOptions = new()
 	{
@@ -78,6 +82,15 @@ public static class McpServer
 		_listener?.Stop();
 		_listener?.Close();
 		_listener = null;
+
+		// Wait briefly for any in-flight RPC tasks to complete before closing SSE streams,
+		// so they don't try to write to a closed stream.
+		var inflight = new List<Task>( _inflightTasks.Values );
+		if ( inflight.Count > 0 )
+		{
+			try { Task.WaitAll( inflight.ToArray(), TimeSpan.FromSeconds( 2 ) ); } catch { }
+		}
+		_inflightTasks.Clear();
 
 		foreach ( var session in _sessions.Values )
 		{
@@ -199,7 +212,13 @@ public static class McpServer
 			if ( id != null )
 			{
 				var bodyCopy = body;
-				_ = Task.Run( async () => await ProcessRpcRequest( session, id, method, bodyCopy ) );
+				var taskId   = Guid.NewGuid();
+				var task     = Task.Run( async () =>
+				{
+					try   { await ProcessRpcRequest( session, id, method, bodyCopy ); }
+					finally { _inflightTasks.TryRemove( taskId, out _ ); }
+				} );
+				_inflightTasks[taskId] = task;
 			}
 			else if ( method == "notifications/initialized" )
 			{
@@ -244,14 +263,22 @@ public static class McpServer
 				var args     = root.TryGetProperty( "params", out var p ) && p.TryGetProperty( "arguments", out var a ) ? a : default;
 				var toolName = root.GetProperty( "params" ).GetProperty( "name" ).GetString();
 
+				// Scene API calls must run on the main thread to avoid race conditions
+				// with S&box's non-thread-safe scene graph.
+				await GameTask.MainThread();
+
 				result = toolName switch
 				{
-					"get_scene_hierarchy"    => ToolHandlers.GetSceneHierarchy( args ),
-					"find_game_objects"      => ToolHandlers.FindGameObjects( args, JsonOptions ),
-					"get_game_object_details"=> ToolHandlers.GetGameObjectDetails( args, JsonOptions ),
-					"get_scene_summary"      => ToolHandlers.GetSceneSummary( JsonOptions ),
-					"run_console_command"    => ToolHandlers.RunConsoleCommand( args ),
-					_                        => throw new InvalidOperationException( $"Tool '{toolName}' not found" )
+					"get_scene_summary"           => ToolHandlers.GetSceneSummary( JsonOptions ),
+					"get_scene_hierarchy"         => ToolHandlers.GetSceneHierarchy( args ),
+					"find_game_objects"           => ToolHandlers.FindGameObjects( args, JsonOptions ),
+					"find_game_objects_in_radius" => ToolHandlers.FindGameObjectsInRadius( args, JsonOptions ),
+					"get_game_object_details"     => ToolHandlers.GetGameObjectDetails( args, JsonOptions ),
+					"get_component_properties"    => ToolHandlers.GetComponentProperties( args, JsonOptions ),
+					"get_prefab_instances"        => ToolHandlers.GetPrefabInstances( args, JsonOptions ),
+					"list_console_commands"       => ToolHandlers.ListConsoleCommands( args, JsonOptions ),
+					"run_console_command"         => ToolHandlers.RunConsoleCommand( args ),
+					_                             => throw new InvalidOperationException( $"Tool '{toolName}' not found" )
 				};
 
 				LogInfo( $"Tool: {toolName}" );

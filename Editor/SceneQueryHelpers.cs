@@ -40,6 +40,30 @@ internal static class SceneQueryHelpers
 	}
 
 	/// <summary>
+	/// Recursively walks all GameObjects in the scene, including those inside
+	/// disabled parents. Use this instead of scene.GetAllObjects(true) whenever
+	/// you need to find disabled objects.
+	/// </summary>
+	internal static IEnumerable<GameObject> WalkAll( Scene scene, bool includeDisabled = true )
+	{
+		foreach ( var root in scene.Children )
+			foreach ( var go in WalkSubtree( root, includeDisabled ) )
+				yield return go;
+	}
+
+	/// <summary>
+	/// Recursively walks a subtree rooted at <paramref name="root"/>.
+	/// </summary>
+	internal static IEnumerable<GameObject> WalkSubtree( GameObject root, bool includeDisabled = true )
+	{
+		if ( !includeDisabled && !root.Enabled ) yield break;
+		yield return root;
+		foreach ( var child in root.Children )
+			foreach ( var go in WalkSubtree( child, includeDisabled ) )
+				yield return go;
+	}
+
+	/// <summary>
 	/// Compact summary used in list results (find_game_objects, get_scene_hierarchy).
 	/// </summary>
 	internal static Dictionary<string, object> BuildObjectSummary( GameObject go )
@@ -62,14 +86,16 @@ internal static class SceneQueryHelpers
 			},
 			["childCount"]       = go.Children.Count,
 			["isPrefabInstance"] = go.IsPrefabInstance,
-			["prefabSource"]     = go.IsPrefabInstance ? go.PrefabInstanceSource : null
+			["prefabSource"]     = go.IsPrefabInstance ? go.PrefabInstanceSource : null,
+			["isNetworkRoot"]    = go.IsNetworkRoot,
+			["networkMode"]      = go.NetworkMode.ToString()
 		};
 	}
 
 	/// <summary>
 	/// Full detail object used by get_game_object_details.
 	/// </summary>
-	internal static Dictionary<string, object> BuildObjectDetail( GameObject go )
+	internal static Dictionary<string, object> BuildObjectDetail( GameObject go, bool includeChildrenRecursive = false )
 	{
 		var wp = go.WorldPosition;
 		var wr = go.WorldRotation;
@@ -88,13 +114,23 @@ internal static class SceneQueryHelpers
 			} );
 		}
 
-		var children = go.Children.Select( c => new Dictionary<string, object>
+		List<object> children;
+		if ( includeChildrenRecursive )
 		{
-			["id"]         = c.Id.ToString(),
-			["name"]       = c.Name,
-			["enabled"]    = c.Enabled,
-			["components"] = GetComponentNames( c )
-		} ).ToList();
+			children = go.Children
+				.Select( c => (object)BuildObjectDetail( c, true ) )
+				.ToList();
+		}
+		else
+		{
+			children = go.Children.Select( c => (object)new Dictionary<string, object>
+			{
+				["id"]         = c.Id.ToString(),
+				["name"]       = c.Name,
+				["enabled"]    = c.Enabled,
+				["components"] = GetComponentNames( c )
+			} ).ToList();
+		}
 
 		return new Dictionary<string, object>
 		{
