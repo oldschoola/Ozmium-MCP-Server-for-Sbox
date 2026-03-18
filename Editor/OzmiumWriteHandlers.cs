@@ -342,11 +342,35 @@ internal static class OzmiumWriteHandlers
 
 	private static object ConvertJsonValue( JsonElement el, Type targetType )
 	{
-		if ( targetType == typeof( string ) )  return el.GetString();
-		if ( targetType == typeof( bool ) )    return el.GetBoolean();
-		if ( targetType == typeof( int ) )     return el.GetInt32();
-		if ( targetType == typeof( float ) )   return el.GetSingle();
-		if ( targetType == typeof( double ) )  return el.GetDouble();
+		if ( targetType == typeof( string ) )
+			return el.ValueKind == JsonValueKind.String ? el.GetString() : el.GetRawText();
+
+		if ( targetType == typeof( bool ) )
+		{
+			if ( el.ValueKind == JsonValueKind.True )  return true;
+			if ( el.ValueKind == JsonValueKind.False ) return false;
+			if ( el.ValueKind == JsonValueKind.String ) return bool.Parse( el.GetString() );
+			return el.GetBoolean();
+		}
+
+		if ( targetType == typeof( int ) )
+		{
+			if ( el.ValueKind == JsonValueKind.String ) return int.Parse( el.GetString() );
+			return el.GetInt32();
+		}
+
+		if ( targetType == typeof( float ) )
+		{
+			if ( el.ValueKind == JsonValueKind.String ) return float.Parse( el.GetString(), System.Globalization.CultureInfo.InvariantCulture );
+			return el.GetSingle();
+		}
+
+		if ( targetType == typeof( double ) )
+		{
+			if ( el.ValueKind == JsonValueKind.String ) return double.Parse( el.GetString(), System.Globalization.CultureInfo.InvariantCulture );
+			return el.GetDouble();
+		}
+
 		if ( targetType == typeof( Vector3 ) && el.ValueKind == JsonValueKind.Object )
 		{
 			float vx = 0, vy = 0, vz = 0;
@@ -355,9 +379,16 @@ internal static class OzmiumWriteHandlers
 			if ( el.TryGetProperty( "z", out var zp ) ) vz = zp.GetSingle();
 			return new Vector3( vx, vy, vz );
 		}
-		if ( targetType.IsEnum ) return Enum.Parse( targetType, el.GetString(), ignoreCase: true );
+
+		if ( targetType.IsEnum )
+		{
+			var str = el.ValueKind == JsonValueKind.String ? el.GetString() : el.GetRawText();
+			return Enum.Parse( targetType, str, ignoreCase: true );
+		}
+
 		// Fallback: try parsing from string
-		return Convert.ChangeType( el.GetString() ?? el.GetRawText(), targetType );
+		var raw = el.ValueKind == JsonValueKind.String ? el.GetString() : el.GetRawText();
+		return Convert.ChangeType( raw, targetType );
 	}
 
 	private static object Txt( string text ) => new { content = new object[] { new { type = "text", text } } };
