@@ -1,0 +1,21 @@
+# s&box auto-generated
+.sbox/
+*.generated.*
+*.*_c
+!*.shader_c
+*.los
+*.vpk
+*.sln
+*.slnx
+*.scene_d
+*.csproj
+
+# Build artifacts
+obj/
+bin/
+*launchSettings.json
+
+# IDE
+.vs/
+.vscode/
+*.user
