@@ -143,9 +143,39 @@ Get or set a console variable. Pass just the name to read its current value; pas
 
 ---
 
+## Git Submodule Setup
+
+If you want to track this library as a git submodule in your S&box project (rather than installing via the Library Manager), add it under your project's `Libraries/` directory:
+
+```bash
+git submodule add https://github.com/ozmium7/Ozmium-MCP-Server-for-Sbox.git Libraries/ozmium.oz_mcp
+```
+
+This will create an entry in your `.gitmodules` like:
+
+```
+[submodule "Libraries/ozmium.oz_mcp"]
+    path = Libraries/ozmium.oz_mcp
+    url = https://github.com/ozmium7/Ozmium-MCP-Server-for-Sbox.git
+```
+
+When cloning a project that already has this submodule registered, initialize and pull it with:
+
+```bash
+git submodule update --init --recursive
+```
+
+To update the submodule to the latest commit on its remote:
+
+```bash
+git submodule update --remote Libraries/ozmium.oz_mcp
+```
+
+---
+
 ## Setup
 
-1. **Install the plugin** — add it via the S&box Library Manager and let it compile.
+1. **Install the plugin** — add it via the S&box Library Manager (or as a git submodule — see above) and let it compile.
 2. **Open the MCP panel** — in the S&box editor go to **Editor → MCP → Open MCP Panel**.
 3. **Start the server** — click **Start MCP Server**. The status indicator turns green.
 4. **Connect your AI assistant** — add this to your MCP config (e.g. `mcp_config.json` for Claude Desktop):
