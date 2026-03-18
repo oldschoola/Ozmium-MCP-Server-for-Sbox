@@ -461,7 +461,14 @@ internal static class OzmiumWriteHandlers
 
 	internal static Dictionary<string, object> SchemaSetGameObjectTags => S( "set_game_object_tags",
 		"Set/add/remove tags. Use 'set' array to replace all, 'add'/'remove' for incremental.",
-		Ps( ("id","string","GUID."), ("name","string","Exact name.") ) );
+		new Dictionary<string, object>
+		{
+			["id"]     = new Dictionary<string, object> { ["type"] = "string", ["description"] = "GUID." },
+			["name"]   = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Exact name." },
+			["set"]    = new Dictionary<string, object> { ["type"] = "array",  ["description"] = "Replace all tags with this list.", ["items"] = new Dictionary<string, object> { ["type"] = "string" } },
+			["add"]    = new Dictionary<string, object> { ["type"] = "array",  ["description"] = "Tags to add.", ["items"] = new Dictionary<string, object> { ["type"] = "string" } },
+			["remove"] = new Dictionary<string, object> { ["type"] = "array",  ["description"] = "Tags to remove.", ["items"] = new Dictionary<string, object> { ["type"] = "string" } },
+		} );
 
 	internal static Dictionary<string, object> SchemaInstantiatePrefab => S( "instantiate_prefab",
 		"Spawn a prefab at a world position. Use browse_assets to find the path first.",
