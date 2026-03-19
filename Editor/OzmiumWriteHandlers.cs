@@ -328,14 +328,9 @@ internal static class OzmiumWriteHandlers
 	/// </summary>
 	private static TypeDescription FindComponentTypeDescription( string typeName )
 	{
-		// Try exact match first (fast path)
-		var td = TypeLibrary.GetType( typeName );
-		if ( td != null && td.TargetType.IsClass && !td.TargetType.IsAbstract
-			&& typeof( Component ).IsAssignableFrom( td.TargetType ) )
-			return td;
-
-		// Search all component types in TypeLibrary for a name match
-		// TypeLibrary.GetTypes<Component>() is indexed and fast
+		// Search all component types in TypeLibrary for a name match.
+		// TypeLibrary.GetTypes<Component>() is indexed and fast.
+		// We search here FIRST so we can prefer game-assembly types over engine built-ins.
 		TypeDescription fallback = null;
 		foreach ( var candidate in TypeLibrary.GetTypes<Component>() )
 		{
@@ -350,7 +345,15 @@ internal static class OzmiumWriteHandlers
 			fallback ??= candidate; // Remember the first engine match as fallback
 		}
 
-		return fallback;
+		if ( fallback != null ) return fallback;
+
+		// Last resort: try exact match by full type name (for edge cases)
+		var td = TypeLibrary.GetType( typeName );
+		if ( td != null && td.TargetType.IsClass && !td.TargetType.IsAbstract
+			&& typeof( Component ).IsAssignableFrom( td.TargetType ) )
+			return td;
+
+		return null;
 	}
 
 	private static object ConvertJsonValue( JsonElement el, Type targetType )
