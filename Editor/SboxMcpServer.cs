@@ -143,28 +143,34 @@ public static class McpServer
 
 	public static void StopServer()
 	{
-		_cts?.Cancel();
-		_listener?.Stop();
-		_listener?.Close();
-		_listener = null;
-
-		// Wait briefly for any in-flight RPC tasks to complete before closing SSE streams.
-		var inflight = new List<Task>( _inflightTasks.Values );
-		if ( inflight.Count > 0 )
+		try
 		{
-			try { Task.WaitAll( inflight.ToArray(), TimeSpan.FromSeconds( 2 ) ); } catch { }
-		}
-		_inflightTasks.Clear();
+			_cts?.Cancel();
 
-		foreach ( var session in _sessions.Values )
+			try { _listener?.Stop(); } catch { }
+			try { _listener?.Close(); } catch { }
+			_listener = null;
+
+			// Don't wait for in-flight tasks — they may be blocked waiting for the
+			// main thread (GameTask.RunInThreadAsync) which would deadlock here.
+			// Just clear the tracking dictionary; the tasks will see the cancelled token
+			// and wind down on their own.
+			_inflightTasks.Clear();
+
+			foreach ( var session in _sessions.Values )
+			{
+				try { session.Tcs.TrySetResult( true ); } catch { }
+				try { session.SseResponse?.Close(); } catch { }
+			}
+			_sessions.Clear();
+
+			LogInfo( "Stopped Model Context Protocol Server" );
+			NotifyStateChanged();
+		}
+		catch ( Exception ex )
 		{
-			session.Tcs.TrySetResult( true );
-			try { session.SseResponse?.Close(); } catch { }
+			try { LogError( $"Error stopping MCP Server: {ex.Message}" ); } catch { }
 		}
-		_sessions.Clear();
-
-		LogInfo( "Stopped Model Context Protocol Server" );
-		NotifyStateChanged();
 	}
 
 	// ── HTTP listen loop ───────────────────────────────────────────────────
