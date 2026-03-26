@@ -462,4 +462,54 @@ internal static class RenderingToolHandlers
 			["zIndex"]           = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Z-order index (default 100)." },
 			["autoScreenScale"]  = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Auto-scale with screen resolution (default true)." }
 		} );
+
+	// ── create_render_entity (Omnibus) ──────────────────────────────────────
+
+	internal static object CreateRenderEntity( JsonElement args )
+	{
+		string renderType = OzmiumSceneHelpers.Get( args, "renderType", "" );
+		return renderType switch
+		{
+			"TextRenderer" => CreateTextRenderer( args ),
+			"LineRenderer" => CreateLineRenderer( args ),
+			"SpriteRenderer" => CreateSpriteRenderer( args ),
+			"TrailRenderer" => CreateTrailRenderer( args ),
+			"ModelRenderer" => CreateModelRenderer( args ),
+			"SkinnedModelRenderer" => CreateSkinnedModel( args ),
+			"ScreenPanel" => CreateScreenPanel( args ),
+			_ => OzmiumSceneHelpers.Txt( $"Unknown renderType: {renderType}" )
+		};
+	}
+
+	internal static Dictionary<string, object> SchemaCreateRenderEntity => S( "create_render_entity",
+		"Create a rendering entity (TextRenderer, LineRenderer, SpriteRenderer, TrailRenderer, ModelRenderer, SkinnedModelRenderer, ScreenPanel).",
+		new Dictionary<string, object>
+		{
+			["renderType"]          = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Type of renderer.", ["enum"] = new[] { "TextRenderer", "LineRenderer", "SpriteRenderer", "TrailRenderer", "ModelRenderer", "SkinnedModelRenderer", "ScreenPanel" } },
+			["x"]                   = new Dictionary<string, object> { ["type"] = "number", ["description"] = "World X position." },
+			["y"]                   = new Dictionary<string, object> { ["type"] = "number", ["description"] = "World Y position." },
+			["z"]                   = new Dictionary<string, object> { ["type"] = "number", ["description"] = "World Z position." },
+			["name"]                = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Name for the GO." },
+			["text"]                = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Text to display." },
+			["fontSize"]            = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Font size." },
+			["color"]               = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Color hex." },
+			["tint"]                = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Color tint hex." },
+			["scale"]               = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Size scale." },
+			["horizontalAlignment"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Horizontal alignment." },
+			["verticalAlignment"]   = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Vertical alignment." },
+			["points"]              = new Dictionary<string, object> { ["type"] = "array",  ["description"] = "Array of Vector3 points {x,y,z}.", ["items"] = new Dictionary<string, object> { ["type"] = "object", ["properties"] = new Dictionary<string, object> { ["x"] = new Dictionary<string, object> { ["type"] = "number" }, ["y"] = new Dictionary<string, object> { ["type"] = "number" }, ["z"] = new Dictionary<string, object> { ["type"] = "number" } } } },
+			["maxPoints"]           = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Maximum trail points." },
+			["pointDistance"]       = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Distance between trail points." },
+			["lifetime"]            = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Trail point lifetime in seconds." },
+			["emitting"]            = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Whether the trail emits points." },
+			["modelPath"]           = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Model asset path." },
+			["castsShadows"]        = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Cast shadows." },
+			["bodyGroups"]          = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Body group mask (ulong)." },
+			["useAnimGraph"]        = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Use animation graph." },
+			["createBoneObjects"]   = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Create bone objects." },
+			["opacity"]             = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Panel opacity." },
+			["zIndex"]              = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Z-order index." },
+			["autoScreenScale"]     = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Auto-scale with screen resolution." }
+		},
+		new[] { "renderType" } );
 }

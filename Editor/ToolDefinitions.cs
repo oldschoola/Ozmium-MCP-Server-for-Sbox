@@ -119,26 +119,10 @@ internal static class ToolDefinitions
 		NavigationToolHandlers.SchemaCreateNavMeshArea,
 
 		// ── Rendering tools ─────────────────────────────────────────────────
-		RenderingToolHandlers.SchemaCreateTextRenderer,
-		RenderingToolHandlers.SchemaCreateLineRenderer,
-		RenderingToolHandlers.SchemaCreateSpriteRenderer,
-		RenderingToolHandlers.SchemaCreateTrailRenderer,
-		RenderingToolHandlers.SchemaCreateModelRenderer,
-		RenderingToolHandlers.SchemaCreateSkinnedModel,
-		RenderingToolHandlers.SchemaCreateScreenPanel,
+		RenderingToolHandlers.SchemaCreateRenderEntity,
 
 		// ── Game tools ──────────────────────────────────────────────────────
-		GameToolHandlers.SchemaCreateSpawnPoint,
-		GameToolHandlers.SchemaCreateTriggerHurt,
-		GameToolHandlers.SchemaCreateEnvmapProbe,
-		GameToolHandlers.SchemaCreateProp,
-		GameToolHandlers.SchemaCreateDecal,
-		GameToolHandlers.SchemaCreateWorldPanel,
-		GameToolHandlers.SchemaCreateFireDamage,
-		GameToolHandlers.SchemaCreateHitbox,
-		GameToolHandlers.SchemaCreateChair,
-		GameToolHandlers.SchemaCreateDresser,
-		GameToolHandlers.SchemaCreateGib,
+		GameToolHandlers.SchemaCreateGameEntity,
 
 		// ── Effect & physics extension tools ────────────────────────────────
 		EffectToolHandlers.SchemaCreateBeamEffect,

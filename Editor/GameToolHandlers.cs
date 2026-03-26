@@ -730,4 +730,81 @@ internal static class GameToolHandlers
 			["fadeTime"]   = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Seconds before auto-fade (default 5)." },
 			["isStatic"]   = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Static gib (default false)." }
 		} );
+
+	// ── create_game_entity (Omnibus) ────────────────────────────────────────
+
+	internal static object CreateGameEntity( JsonElement args )
+	{
+		string entityType = OzmiumSceneHelpers.Get( args, "entityType", "" );
+		return entityType switch
+		{
+			"SpawnPoint" => CreateSpawnPoint( args ),
+			"TriggerHurt" => CreateTriggerHurt( args ),
+			"EnvmapProbe" => CreateEnvmapProbe( args ),
+			"Prop" => CreateProp( args ),
+			"Decal" => CreateDecal( args ),
+			"WorldPanel" => CreateWorldPanel( args ),
+			"FireDamage" => CreateFireDamage( args ),
+			"ManualHitbox" => CreateHitbox( args ),
+			"BaseChair" => CreateChair( args ),
+			"Dresser" => CreateDresser( args ),
+			"Gib" => CreateGib( args ),
+			_ => OzmiumSceneHelpers.Txt( $"Unknown entityType: {entityType}" )
+		};
+	}
+
+	internal static Dictionary<string, object> SchemaCreateGameEntity => S( "create_game_entity",
+		"Create a specific game entity (SpawnPoint, TriggerHurt, EnvmapProbe, Prop, Decal, WorldPanel, FireDamage, ManualHitbox, BaseChair, Dresser, Gib).",
+		new Dictionary<string, object>
+		{
+			["entityType"]      = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Type of entity to create.", ["enum"] = new[] { "SpawnPoint", "TriggerHurt", "EnvmapProbe", "Prop", "Decal", "WorldPanel", "FireDamage", "ManualHitbox", "BaseChair", "Dresser", "Gib" } },
+			["id"]              = new Dictionary<string, object> { ["type"] = "string", ["description"] = "GUID of existing GO (for some components)." },
+			["x"]               = new Dictionary<string, object> { ["type"] = "number", ["description"] = "World X position." },
+			["y"]               = new Dictionary<string, object> { ["type"] = "number", ["description"] = "World Y position." },
+			["z"]               = new Dictionary<string, object> { ["type"] = "number", ["description"] = "World Z position." },
+			["name"]            = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Name for the GO." },
+			["modelPath"]       = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Model asset path." },
+			["tint"]            = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Color tint hex." },
+			["colorTint"]       = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Decal color tint hex." },
+			["health"]          = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Prop health." },
+			["isStatic"]        = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Static prop/gib." },
+			["startAsleep"]     = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Start physics asleep." },
+			["damage"]          = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Damage per tick (TriggerHurt)." },
+			["rate"]            = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Seconds between damage ticks (TriggerHurt)." },
+			["damagePerSecond"] = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Damage per second (FireDamage)." },
+			["mode"]            = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Probe mode." },
+			["resolution"]      = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Cubemap resolution." },
+			["sizeX"]           = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Decal width." },
+			["sizeY"]           = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Decal height." },
+			["depth"]           = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Projection depth." },
+			["lifeTime"]        = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Lifetime in seconds." },
+			["fadeTime"]        = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Seconds before auto-fade (Gib)." },
+			["looped"]          = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Repeat forever." },
+			["transient"]       = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Auto-remove when max decals exceeded." },
+			["attenuationAngle"]= new Dictionary<string, object> { ["type"] = "number", ["description"] = "Angle fade." },
+			["sortLayer"]       = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Render sort layer." },
+			["renderScale"]     = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Render scale (WorldPanel)." },
+			["lookAtCamera"]    = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Billboard toward camera (WorldPanel)." },
+			["panelSize"]       = new Dictionary<string, object> { ["type"] = "object", ["description"] = "Panel size {x,y}." },
+			["horizontalAlign"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Horizontal alignment." },
+			["verticalAlign"]   = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Vertical alignment." },
+			["interactionRange"]= new Dictionary<string, object> { ["type"] = "number", ["description"] = "Max interaction distance." },
+			["shape"]           = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Hitbox shape." },
+			["radius"]          = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Hitbox radius." },
+			["centerA"]         = new Dictionary<string, object> { ["type"] = "object", ["description"] = "Center A point {x,y,z}." },
+			["centerB"]         = new Dictionary<string, object> { ["type"] = "object", ["description"] = "Center B point {x,y,z}." },
+			["hitboxTags"]      = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Comma-separated hitbox tags." },
+			["targetId"]        = new Dictionary<string, object> { ["type"] = "string", ["description"] = "GUID of the target GameObject." },
+			["targetName"]      = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Name of the target GameObject." },
+			["sitPose"]         = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Sit pose animation." },
+			["sitHeight"]       = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Sit height offset." },
+			["tooltipTitle"]    = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Tooltip title." },
+			["tooltipIcon"]     = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Tooltip icon name." },
+			["source"]          = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Clothing source." },
+			["manualHeight"]    = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Manual height." },
+			["manualTint"]      = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Manual skin tint." },
+			["manualAge"]       = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Manual age." },
+			["applyHeightScale"]= new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Apply height scale." }
+		},
+		new[] { "entityType" } );
 }
