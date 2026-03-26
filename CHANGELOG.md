@@ -2,6 +2,27 @@
 
 ## [Unreleased]
 
+### 2026-03-26 — Feature: Comprehensive Tool Handlers Refactoring & Expansion
+
+**Problem:** The MCP server's tool handler classes were becoming monolithic and difficult to maintain. As new capabilities were requested for different engine subsystems, keeping them in a few centralized files restricted organization and scalability.
+
+**Solution:** Modularized the MCP server by introducing dedicated handler classes for specific S&box engine components and subsystems. This expansion allows logical grouping of tools, easier maintenance, and paves the way for deeper integration with engine features like Physics, Audio, and Navigation.
+
+**Files Added/Modified:**
+- `Editor/AudioToolHandlers.cs` — Audio tools (create/configure sound point)
+- `Editor/CameraToolHandlers.cs` — Camera tools (create/configure camera)
+- `Editor/EffectToolHandlers.cs` — Effect & environment tools
+- `Editor/GameToolHandlers.cs` — Game logic tools (spawn points, triggers, etc.)
+- `Editor/LightingToolHandlers.cs` — Lighting tools (create/configure light, sky box)
+- `Editor/MeshEditHandlers.cs` — Mesh editing tools
+- `Editor/NavigationToolHandlers.cs` — Navigation tools (nav mesh agent, link, area)
+- `Editor/PhysicsToolHandlers.cs` — Physics tools (add/configure collider, rigidbody)
+- `Editor/RenderingToolHandlers.cs` — Rendering tools (text, line, sprite, trail, model renderer)
+- `Editor/UtilityToolHandlers.cs` — Utility tools (asset dependencies, batch transform, etc.)
+- `Editor/ToolDefinitions.cs` & `Editor/RpcDispatcher.cs` — Updated to register new modular schemas.
+
+**Acknowledgments:**
+- Huge thanks to **Oldschoola** for their continued contributions and input on this massive update.
 ### 2026-03-18 — Feature: Custom Logo Header & Colorized Logs
 
 **Problem:** The MCP Server panel was a standard gray interface with a monolithic block of uncolored text, making it difficult to distinguish tool names from initialization events or errors. Additionally, standard audio `.wav` files were ignored by S&box's rigid asset pipeline.

@@ -35,11 +35,21 @@ internal static class ToolDefinitions
 		OzmiumWriteHandlers.SchemaUndo,
 		OzmiumWriteHandlers.SchemaRedo,
 
+		// ── Batch transform & object management ────────────────────────────
+		OzmiumWriteHandlers.SchemaSetGameObjectTransform,
+		OzmiumWriteHandlers.SchemaDuplicateGameObject,
+		OzmiumWriteHandlers.SchemaSetGameObjectEnabled,
+		OzmiumWriteHandlers.SchemaSetGameObjectName,
+		OzmiumWriteHandlers.SchemaSetComponentEnabled,
+
 		// ── New asset tools ────────────────────────────────────────────────
 		OzmiumAssetHandlers.SchemaGetModelInfo,
 		OzmiumAssetHandlers.SchemaGetMaterialProperties,
 		OzmiumAssetHandlers.SchemaGetPrefabStructure,
 		OzmiumAssetHandlers.SchemaReloadAsset,
+		OzmiumAssetHandlers.SchemaGetComponentTypes,
+		OzmiumAssetHandlers.SchemaSearchAssets,
+		OzmiumAssetHandlers.SchemaGetSceneStatistics,
 
 		// ── New editor control tools ───────────────────────────────────────
 		OzmiumEditorHandlers.SchemaSelectGameObject,
@@ -48,5 +58,100 @@ internal static class ToolDefinitions
 		OzmiumEditorHandlers.SchemaStartPlayMode,
 		OzmiumEditorHandlers.SchemaStopPlayMode,
 		OzmiumEditorHandlers.SchemaGetEditorLog,
+		OzmiumEditorHandlers.SchemaGetSelectedObjects,
+		OzmiumEditorHandlers.SchemaSetSelectedObjects,
+		OzmiumEditorHandlers.SchemaClearSelection,
+
+		// ── Mesh editing tools ───────────────────────────────────────────────
+		MeshEditHandlers.SchemaCreateBlock,
+		MeshEditHandlers.SchemaSetFaceMaterial,
+		MeshEditHandlers.SchemaSetTextureParameters,
+		MeshEditHandlers.SchemaSetVertexPosition,
+		MeshEditHandlers.SchemaSetVertexColor,
+		MeshEditHandlers.SchemaSetVertexBlend,
+		MeshEditHandlers.SchemaGetMeshInfo,
+
+		// ── Lighting tools ──────────────────────────────────────────────────
+		LightingToolHandlers.SchemaCreateLight,
+		LightingToolHandlers.SchemaConfigureLight,
+		LightingToolHandlers.SchemaCreateSkyBox,
+		LightingToolHandlers.SchemaSetSkyBox,
+		LightingToolHandlers.SchemaCreateAmbientLight,
+		LightingToolHandlers.SchemaCreateIndirectLightVolume,
+
+		// ── Physics & collider tools ────────────────────────────────────────
+		PhysicsToolHandlers.SchemaAddCollider,
+		PhysicsToolHandlers.SchemaConfigureCollider,
+		PhysicsToolHandlers.SchemaAddRigidbody,
+		PhysicsToolHandlers.SchemaCreateCharacterController,
+		PhysicsToolHandlers.SchemaAddPlaneCollider,
+		PhysicsToolHandlers.SchemaAddHullCollider,
+		PhysicsToolHandlers.SchemaCreateModelPhysics,
+
+		// ── Audio tools ─────────────────────────────────────────────────────
+		AudioToolHandlers.SchemaCreateSoundPoint,
+		AudioToolHandlers.SchemaConfigureSound,
+		AudioToolHandlers.SchemaCreateSoundscapeTrigger,
+		AudioToolHandlers.SchemaCreateSoundBox,
+		AudioToolHandlers.SchemaCreateDspVolume,
+		AudioToolHandlers.SchemaCreateAudioListener,
+
+		// ── Camera tools ────────────────────────────────────────────────────
+		CameraToolHandlers.SchemaCreateCamera,
+		CameraToolHandlers.SchemaConfigureCamera,
+
+		// ── Effect & environment tools ──────────────────────────────────────
+		EffectToolHandlers.SchemaCreateParticleEffect,
+		EffectToolHandlers.SchemaConfigureParticleEffect,
+		EffectToolHandlers.SchemaCreateFogVolume,
+		EffectToolHandlers.SchemaConfigurePostProcessing,
+		EffectToolHandlers.SchemaCreateEnvironmentLight,
+
+		// ── Utility tools ───────────────────────────────────────────────────
+		UtilityToolHandlers.SchemaGetAssetDependencies,
+		UtilityToolHandlers.SchemaBatchTransform,
+		UtilityToolHandlers.SchemaCopyComponent,
+		UtilityToolHandlers.SchemaGetObjectBounds,
+
+		// ── Navigation tools ────────────────────────────────────────────────
+		NavigationToolHandlers.SchemaCreateNavMeshAgent,
+		NavigationToolHandlers.SchemaCreateNavMeshLink,
+		NavigationToolHandlers.SchemaCreateNavMeshArea,
+
+		// ── Rendering tools ─────────────────────────────────────────────────
+		RenderingToolHandlers.SchemaCreateTextRenderer,
+		RenderingToolHandlers.SchemaCreateLineRenderer,
+		RenderingToolHandlers.SchemaCreateSpriteRenderer,
+		RenderingToolHandlers.SchemaCreateTrailRenderer,
+		RenderingToolHandlers.SchemaCreateModelRenderer,
+		RenderingToolHandlers.SchemaCreateSkinnedModel,
+		RenderingToolHandlers.SchemaCreateScreenPanel,
+
+		// ── Game tools ──────────────────────────────────────────────────────
+		GameToolHandlers.SchemaCreateSpawnPoint,
+		GameToolHandlers.SchemaCreateTriggerHurt,
+		GameToolHandlers.SchemaCreateEnvmapProbe,
+		GameToolHandlers.SchemaCreateProp,
+		GameToolHandlers.SchemaCreateDecal,
+		GameToolHandlers.SchemaCreateWorldPanel,
+		GameToolHandlers.SchemaCreateFireDamage,
+		GameToolHandlers.SchemaCreateHitbox,
+		GameToolHandlers.SchemaCreateChair,
+		GameToolHandlers.SchemaCreateDresser,
+		GameToolHandlers.SchemaCreateGib,
+
+		// ── Effect & physics extension tools ────────────────────────────────
+		EffectToolHandlers.SchemaCreateBeamEffect,
+		EffectToolHandlers.SchemaCreateVerletRope,
+		EffectToolHandlers.SchemaCreateJoint,
+		EffectToolHandlers.SchemaCreateClutter,
+		EffectToolHandlers.SchemaCreateRadiusDamage,
+
+		// ── Editor & scene extension tools ──────────────────────────────────
+		OzmiumEditorHandlers.SchemaFrameSelection,
+		OzmiumEditorHandlers.SchemaSaveSceneAs,
+		OzmiumEditorHandlers.SchemaGetSceneUnsaved,
+		OzmiumEditorHandlers.SchemaBreakFromPrefab,
+		OzmiumEditorHandlers.SchemaUpdateFromPrefab,
 	};
 }

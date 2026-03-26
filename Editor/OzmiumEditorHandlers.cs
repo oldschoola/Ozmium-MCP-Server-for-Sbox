@@ -36,13 +36,13 @@ internal static class OzmiumEditorHandlers
 	internal static object SelectGameObject( JsonElement args )
 	{
 		var scene = OzmiumSceneHelpers.ResolveScene();
-		if ( scene == null ) return Txt( "No active scene." );
+		if ( scene == null ) return OzmiumSceneHelpers.Txt( "No active scene." );
 
-		string id   = Get( args, "id",   (string)null );
-		string name = Get( args, "name", (string)null );
+		string id   = OzmiumSceneHelpers.Get( args, "id",   (string)null );
+		string name = OzmiumSceneHelpers.Get( args, "name", (string)null );
 
 		var go = OzmiumSceneHelpers.FindGo( scene, id, name );
-		if ( go == null ) return Txt( $"Object not found: id='{id}' name='{name}'." );
+		if ( go == null ) return OzmiumSceneHelpers.Txt( $"Object not found: id='{id}' name='{name}'." );
 
 		try
 		{
@@ -60,26 +60,26 @@ internal static class OzmiumEditorHandlers
 					setMethod?.Invoke( selObj, new object[] { go } );
 				}
 			}
-			return Txt( $"Selected '{go.Name}' (ID: {go.Id})." );
+			return OzmiumSceneHelpers.Txt( $"Selected '{go.Name}' (ID: {go.Id})." );
 		}
-		catch ( Exception ex ) { return Txt( $"Error: {ex.Message}" ); }
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
 
 	// ── open_asset ──────────────────────────────────────────────────────────
 
 	internal static object OpenAsset( JsonElement args )
 	{
-		string path = Get( args, "path", (string)null );
-		if ( string.IsNullOrEmpty( path ) ) return Txt( "Provide 'path'." );
+		string path = OzmiumSceneHelpers.Get( args, "path", (string)null );
+		if ( string.IsNullOrEmpty( path ) ) return OzmiumSceneHelpers.Txt( "Provide 'path'." );
 
 		try
 		{
 			var asset = AssetSystem.FindByPath( path );
-			if ( asset == null ) return Txt( $"Asset not found: '{path}'." );
+			if ( asset == null ) return OzmiumSceneHelpers.Txt( $"Asset not found: '{path}'." );
 			asset.OpenInEditor();
-			return Txt( $"Opened '{path}' in editor." );
+			return OzmiumSceneHelpers.Txt( $"Opened '{path}' in editor." );
 		}
-		catch ( Exception ex ) { return Txt( $"Error: {ex.Message}" ); }
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
 
 	// ── get_play_state ──────────────────────────────────────────────────────
@@ -88,7 +88,7 @@ internal static class OzmiumEditorHandlers
 	{
 		var session = SceneEditorSession.Active;
 		var state = session?.IsPlaying == true ? "Playing" : "Stopped";
-		return Txt( JsonSerializer.Serialize( new { playState = state }, _json ) );
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new { playState = state }, _json ) );
 	}
 
 	// ── start_play_mode ─────────────────────────────────────────────────────
@@ -98,12 +98,12 @@ internal static class OzmiumEditorHandlers
 		try
 		{
 			var session = SceneEditorSession.Active;
-			if ( session == null ) return Txt( "No editor session." );
-			if ( session.IsPlaying ) return Txt( "Already playing." );
+			if ( session == null ) return OzmiumSceneHelpers.Txt( "No editor session." );
+			if ( session.IsPlaying ) return OzmiumSceneHelpers.Txt( "Already playing." );
 			session.SetPlaying( session.Scene );
-			return Txt( "Play mode started." );
+			return OzmiumSceneHelpers.Txt( "Play mode started." );
 		}
-		catch ( Exception ex ) { return Txt( $"Error starting play mode: {ex.Message}" ); }
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error starting play mode: {ex.Message}" ); }
 	}
 
 	// ── stop_play_mode ──────────────────────────────────────────────────────
@@ -113,28 +113,28 @@ internal static class OzmiumEditorHandlers
 		try
 		{
 			var session = SceneEditorSession.Active;
-			if ( session == null ) return Txt( "No editor session." );
-			if ( !session.IsPlaying ) return Txt( "Already stopped." );
+			if ( session == null ) return OzmiumSceneHelpers.Txt( "No editor session." );
+			if ( !session.IsPlaying ) return OzmiumSceneHelpers.Txt( "Already stopped." );
 			session.StopPlaying();
-			return Txt( "Play mode stopped." );
+			return OzmiumSceneHelpers.Txt( "Play mode stopped." );
 		}
-		catch ( Exception ex ) { return Txt( $"Error stopping play mode: {ex.Message}" ); }
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error stopping play mode: {ex.Message}" ); }
 	}
 
 	// ── get_editor_log ──────────────────────────────────────────────────────
 
 	internal static object GetEditorLog( JsonElement args )
 	{
-		int lines = Get( args, "lines", 50 );
+		int lines = OzmiumSceneHelpers.Get( args, "lines", 50 );
 		var recent = _log.TakeLast( lines ).ToList();
-		return Txt( string.Join( "\n", recent ) );
+		return OzmiumSceneHelpers.Txt( string.Join( "\n", recent ) );
 	}
 
 	// ── list_console_commands ───────────────────────────────────────────────
 
 	internal static object ListConsoleCommands( JsonElement args )
 	{
-		string filter = Get( args, "filter", (string)null );
+		string filter = OzmiumSceneHelpers.Get( args, "filter", (string)null );
 		var entries = new List<Dictionary<string, object>>();
 
 		foreach ( var asm in AppDomain.CurrentDomain.GetAssemblies() )
@@ -167,7 +167,7 @@ internal static class OzmiumEditorHandlers
 		entries = entries.GroupBy( e => e["name"]?.ToString() ).Select( g => g.First() )
 			.OrderBy( e => e["name"]?.ToString() ).ToList();
 
-		return Txt( JsonSerializer.Serialize( new { summary = $"Found {entries.Count} [ConVar] entries{( !string.IsNullOrEmpty( filter ) ? $" matching '{filter}'" : "" )}.", entries, skippedAssemblies = Array.Empty<string>() }, _json ) );
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new { summary = $"Found {entries.Count} [ConVar] entries{( !string.IsNullOrEmpty( filter ) ? $" matching '{filter}'" : "" )}.", entries, skippedAssemblies = Array.Empty<string>() }, _json ) );
 	}
 
 	// ── run_console_command ─────────────────────────────────────────────────
@@ -176,54 +176,106 @@ internal static class OzmiumEditorHandlers
 	{
 		var cmd   = args.GetProperty( "command" ).GetString()?.Trim() ?? "";
 		var parts = cmd.Split( ' ', StringSplitOptions.RemoveEmptyEntries );
-		if ( parts.Length == 0 ) return Txt( "Provide a command." );
+		if ( parts.Length == 0 ) return OzmiumSceneHelpers.Txt( "Provide a command." );
 
 		var cmdName = parts[0];
 		string current = null;
 		try { current = Sandbox.ConsoleSystem.GetValue( cmdName ); } catch { }
 
 		if ( current == null )
-			return Txt( $"Unknown convar '{cmdName}'. Only [ConVar] properties are supported." );
+			return OzmiumSceneHelpers.Txt( $"Unknown convar '{cmdName}'. Only [ConVar] properties are supported." );
 
-		if ( parts.Length == 1 ) return Txt( $"{cmdName} = {current}" );
+		if ( parts.Length == 1 ) return OzmiumSceneHelpers.Txt( $"{cmdName} = {current}" );
 
 		var newVal = string.Join( " ", parts.Skip( 1 ) );
 		Sandbox.ConsoleSystem.SetValue( cmdName, newVal );
 		string readback = null;
 		try { readback = Sandbox.ConsoleSystem.GetValue( cmdName ); } catch { }
-		return Txt( $"Set {cmdName} = {readback ?? newVal}" );
+		return OzmiumSceneHelpers.Txt( $"Set {cmdName} = {readback ?? newVal}" );
 	}
 
-	// ── Helpers ────────────────────────────────────────────────────────────
+	// ── get_selected_objects ──────────────────────────────────────────────
 
-	private static object Txt( string text ) => new { content = new object[] { new { type = "text", text } } };
-
-	private static T Get<T>( JsonElement el, string key, T def )
+	internal static object GetSelectedObjects()
 	{
-		if ( el.ValueKind == JsonValueKind.Undefined ) return def;
-		if ( !el.TryGetProperty( key, out var p ) ) return def;
+		var selected = OzmiumSceneHelpers.GetSelectedGameObjects();
+		var results = selected.Select( go => OzmiumSceneHelpers.BuildSummary( go ) ).ToList();
+		var summary = $"{results.Count} object(s) selected.";
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new { summary, results }, _json ) );
+	}
+
+	// ── set_selected_objects ──────────────────────────────────────────────
+
+	internal static object SetSelectedObjects( JsonElement args )
+	{
+		if ( !args.TryGetProperty( "ids", out var idsEl ) || idsEl.ValueKind != JsonValueKind.Array )
+			return OzmiumSceneHelpers.Txt( "Provide 'ids' as a string array of GUIDs." );
+
 		try
 		{
-			var t = typeof( T );
-			if ( t == typeof( string ) ) return (T)(object)( p.ValueKind == JsonValueKind.Null ? null : p.GetString() );
-			if ( t == typeof( bool ) )   return (T)(object)p.GetBoolean();
-			if ( t == typeof( int ) )    return (T)(object)p.GetInt32();
-			if ( t == typeof( float ) )  return (T)(object)p.GetSingle();
-			return def;
+			var session = SceneEditorSession.Active;
+			if ( session == null ) return OzmiumSceneHelpers.Txt( "No editor session active." );
+
+			var selProp = session.GetType().GetProperty( "Selection",
+				System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance );
+			var selObj = selProp?.GetValue( session );
+			if ( selObj == null ) return OzmiumSceneHelpers.Txt( "Selection API not available." );
+
+			// Clear then Add each object — SelectionSystem has Set(object) and Add(object),
+			// not Set(IEnumerable). Using Add after Clear supports multi-select.
+			var clearMethod = selObj.GetType().GetMethod( "Clear" );
+			clearMethod?.Invoke( selObj, null );
+
+			var addMethod = selObj.GetType().GetMethod( "Add", new[] { typeof( object ) } );
+			if ( addMethod == null ) return OzmiumSceneHelpers.Txt( "Selection.Add not available." );
+
+			var scene = OzmiumSceneHelpers.ResolveScene();
+			if ( scene == null ) return OzmiumSceneHelpers.Txt( "No active scene." );
+
+			int count = 0;
+			foreach ( var idEl in idsEl.EnumerateArray() )
+			{
+				var guidStr = idEl.GetString();
+				if ( !string.IsNullOrEmpty( guidStr ) && Guid.TryParse( guidStr, out var guid ) )
+				{
+					var go = OzmiumSceneHelpers.WalkAll( scene, true ).FirstOrDefault( g => g.Id == guid );
+					if ( go != null )
+					{
+						addMethod.Invoke( selObj, new object[] { go } );
+						count++;
+					}
+				}
+			}
+			return OzmiumSceneHelpers.Txt( $"Selected {count} object(s)." );
 		}
-		catch { return def; }
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
+	}
+
+	// ── clear_selection ──────────────────────────────────────────────────
+
+	internal static object ClearSelection()
+	{
+		try
+		{
+			var session = SceneEditorSession.Active;
+			if ( session == null ) return OzmiumSceneHelpers.Txt( "No editor session active." );
+
+			var selProp = session.GetType().GetProperty( "Selection",
+				System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance );
+			var selObj = selProp?.GetValue( session );
+			if ( selObj == null ) return OzmiumSceneHelpers.Txt( "Selection API not available." );
+
+			var clearMethod = selObj.GetType().GetMethod( "Clear" );
+			clearMethod?.Invoke( selObj, null );
+
+			return OzmiumSceneHelpers.Txt( "Selection cleared." );
+		}
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
 
 	// ── Schemas ─────────────────────────────────────────────────────────────
 
-	private static Dictionary<string, object> S( string name, string desc, Dictionary<string, object> props, string[] req = null )
-	{
-		var schema = new Dictionary<string, object> { ["type"] = "object", ["properties"] = props };
-		if ( req != null ) schema["required"] = req;
-		return new Dictionary<string, object> { ["name"] = name, ["description"] = desc, ["inputSchema"] = schema };
-	}
-
-	internal static Dictionary<string, object> SchemaSelectGameObject => S( "select_game_object",
+	internal static Dictionary<string, object> SchemaSelectGameObject => OzmiumSceneHelpers.S( "select_game_object",
 		"Select a GameObject in the editor hierarchy and viewport.",
 		new Dictionary<string, object>
 		{
@@ -231,25 +283,254 @@ internal static class OzmiumEditorHandlers
 			["name"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Exact name." }
 		} );
 
-	internal static Dictionary<string, object> SchemaOpenAsset => S( "open_asset",
+	internal static Dictionary<string, object> SchemaOpenAsset => OzmiumSceneHelpers.S( "open_asset",
 		"Open an asset in its default editor (scene, prefab, material, etc.).",
 		new Dictionary<string, object> { ["path"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Asset path to open." } },
 		new[] { "path" } );
 
-	internal static Dictionary<string, object> SchemaGetPlayState => S( "get_play_state",
+	internal static Dictionary<string, object> SchemaGetPlayState => OzmiumSceneHelpers.S( "get_play_state",
 		"Returns the current play state: 'Playing' or 'Stopped'.",
 		new Dictionary<string, object>() );
 
-	internal static Dictionary<string, object> SchemaStartPlayMode => S( "start_play_mode",
+	internal static Dictionary<string, object> SchemaStartPlayMode => OzmiumSceneHelpers.S( "start_play_mode",
 		"Press the Play button in the editor.",
 		new Dictionary<string, object>() );
 
-	internal static Dictionary<string, object> SchemaStopPlayMode => S( "stop_play_mode",
+	internal static Dictionary<string, object> SchemaStopPlayMode => OzmiumSceneHelpers.S( "stop_play_mode",
 		"Press the Stop button in the editor.",
 		new Dictionary<string, object>() );
 
-	internal static Dictionary<string, object> SchemaGetEditorLog => S( "get_editor_log",
+	internal static Dictionary<string, object> SchemaGetEditorLog => OzmiumSceneHelpers.S( "get_editor_log",
 		"Return recent log lines captured from the editor output.",
 		new Dictionary<string, object> { ["lines"] = new Dictionary<string, object> { ["type"] = "integer", ["description"] = "Number of recent lines (default 50)." } } );
+
+	internal static Dictionary<string, object> SchemaGetSelectedObjects => OzmiumSceneHelpers.S( "get_selected_objects",
+		"Return the currently selected objects in the editor.",
+		new Dictionary<string, object>() );
+
+	internal static Dictionary<string, object> SchemaSetSelectedObjects => OzmiumSceneHelpers.S( "set_selected_objects",
+		"Select multiple objects at once.",
+		new Dictionary<string, object>
+		{
+			["ids"] = new Dictionary<string, object>
+			{
+				["type"] = "array",
+				["description"] = "Array of GUID strings to select.",
+				["items"] = new Dictionary<string, object> { ["type"] = "string" }
+			}
+		},
+		new[] { "ids" } );
+
+	internal static Dictionary<string, object> SchemaClearSelection => OzmiumSceneHelpers.S( "clear_selection",
+		"Clear the editor selection.",
+		new Dictionary<string, object>() );
+
+	// ── frame_selection ──────────────────────────────────────────────────
+
+	private static BBox GetGameObjectBounds( GameObject go )
+	{
+		// Try collider bounds first (most accurate)
+		var collider = go.Components.GetAll().FirstOrDefault( c => c is Collider ) as Collider;
+		if ( collider != null )
+			return collider.GetWorldBounds();
+
+		// Fallback: use position with a small extent
+		return BBox.FromPositionAndSize( go.WorldPosition, 1f );
+	}
+
+	private static BBox CombineBounds( IEnumerable<GameObject> objects )
+	{
+		var first = true;
+		BBox result = default;
+		foreach ( var obj in objects )
+		{
+			var b = GetGameObjectBounds( obj );
+			if ( first ) { result = b; first = false; }
+			else { result = new BBox( Vector3.Min( result.Mins, b.Mins ), Vector3.Max( result.Maxs, b.Maxs ) ); }
+		}
+		return result;
+	}
+
+	internal static object FrameSelection( JsonElement args )
+	{
+		var scene = OzmiumSceneHelpers.ResolveScene();
+		if ( scene == null ) return OzmiumSceneHelpers.Txt( "No active scene." );
+
+		try
+		{
+			var session = SceneEditorSession.Active;
+			if ( session == null ) return OzmiumSceneHelpers.Txt( "No editor session." );
+
+			BBox bounds;
+
+			// If specific objects are given, compute their combined bounds
+			if ( args.TryGetProperty( "ids", out var idsEl ) && idsEl.ValueKind == JsonValueKind.Array )
+			{
+				var objects = new List<GameObject>();
+				foreach ( var idEl in idsEl.EnumerateArray() )
+				{
+					var guidStr = idEl.GetString();
+					if ( !string.IsNullOrEmpty( guidStr ) && Guid.TryParse( guidStr, out var guid ) )
+					{
+						var go = OzmiumSceneHelpers.WalkAll( scene, true ).FirstOrDefault( g => g.Id == guid );
+						if ( go != null ) objects.Add( go );
+					}
+				}
+				if ( objects.Count == 0 ) return OzmiumSceneHelpers.Txt( "No matching objects found." );
+
+				bounds = CombineBounds( objects );
+			}
+			else
+			{
+				// Default: use current selection
+				var selected = OzmiumSceneHelpers.GetSelectedGameObjects().ToList();
+				if ( selected.Count == 0 ) return OzmiumSceneHelpers.Txt( "No selection to frame." );
+
+				bounds = CombineBounds( selected );
+			}
+
+			// Use reflection to call FrameTo(in BBox) on the session
+			var frameMethod = session.GetType().GetMethod( "FrameTo",
+				new[] { typeof( BBox ) } );
+			if ( frameMethod == null ) return OzmiumSceneHelpers.Txt( "FrameTo not available on this session type." );
+
+			frameMethod.Invoke( session, new object[] { bounds } );
+			return OzmiumSceneHelpers.Txt( $"Framed selection to {bounds}." );
+		}
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
+	}
+
+	// ── save_scene_as ──────────────────────────────────────────────────
+
+	internal static object SaveSceneAs( JsonElement args )
+	{
+		string path = OzmiumSceneHelpers.Get( args, "path", (string)null );
+		if ( string.IsNullOrEmpty( path ) ) return OzmiumSceneHelpers.Txt( "Provide 'path' for the new scene file." );
+
+		try
+		{
+			var session = SceneEditorSession.Active;
+			if ( session == null ) return OzmiumSceneHelpers.Txt( "No editor session." );
+
+			// Use reflection: ISceneEditorSession.Save(bool forceSaveAs)
+			// The Save method with forceSaveAs=true triggers Save As dialog-like behavior.
+			// However, the API doesn't directly accept a path parameter — it uses the engine's
+			// file dialog. We'll note this limitation.
+			var saveMethod = session.GetType().GetMethod( "Save", new[] { typeof( bool ) } );
+			if ( saveMethod != null )
+			{
+				saveMethod.Invoke( session, new object[] { true } );
+				return OzmiumSceneHelpers.Txt( $"Save As dialog opened. Note: S&box API does not support programmatic path; user must choose '{path}' in the dialog." );
+			}
+
+			return OzmiumSceneHelpers.Txt( "Save method not available on this session type." );
+		}
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
+	}
+
+	// ── get_scene_unsaved ───────────────────────────────────────────────
+
+	internal static object GetSceneUnsaved()
+	{
+		try
+		{
+			var session = SceneEditorSession.Active;
+			if ( session == null ) return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new
+			{
+				hasUnsavedChanges = false,
+				message = "No editor session active."
+			}, _json ) );
+
+			var hasUnsaved = session.HasUnsavedChanges;
+			return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new
+			{
+				hasUnsavedChanges = hasUnsaved,
+				message = hasUnsaved ? "Scene has unsaved changes." : "Scene is saved."
+			}, _json ) );
+		}
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
+	}
+
+	// ── break_from_prefab ───────────────────────────────────────────────
+
+	internal static object BreakFromPrefab( JsonElement args )
+	{
+		var scene = OzmiumSceneHelpers.ResolveScene();
+		if ( scene == null ) return OzmiumSceneHelpers.Txt( "No active scene." );
+
+		string id   = OzmiumSceneHelpers.Get( args, "id",   (string)null );
+		string name = OzmiumSceneHelpers.Get( args, "name", (string)null );
+
+		var go = OzmiumSceneHelpers.FindGo( scene, id, name );
+		if ( go == null ) return OzmiumSceneHelpers.Txt( $"Object not found: id='{id}' name='{name}'." );
+
+		try
+		{
+			go.BreakFromPrefab();
+			return OzmiumSceneHelpers.Txt( $"Broke '{go.Name}' from its prefab source." );
+		}
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
+	}
+
+	// ── update_from_prefab ──────────────────────────────────────────────
+
+	internal static object UpdateFromPrefab( JsonElement args )
+	{
+		var scene = OzmiumSceneHelpers.ResolveScene();
+		if ( scene == null ) return OzmiumSceneHelpers.Txt( "No active scene." );
+
+		string id   = OzmiumSceneHelpers.Get( args, "id",   (string)null );
+		string name = OzmiumSceneHelpers.Get( args, "name", (string)null );
+
+		var go = OzmiumSceneHelpers.FindGo( scene, id, name );
+		if ( go == null ) return OzmiumSceneHelpers.Txt( $"Object not found: id='{id}' name='{name}'." );
+
+		try
+		{
+			go.UpdateFromPrefab();
+			return OzmiumSceneHelpers.Txt( $"Updated '{go.Name}' from its prefab source." );
+		}
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
+	}
+
+	// ── Schemas (extensions) ─────────────────────────────────────────────
+
+	internal static Dictionary<string, object> SchemaFrameSelection => OzmiumSceneHelpers.S( "frame_selection",
+		"Focus the editor camera on the current selection or specified objects.",
+		new Dictionary<string, object>
+		{
+			["ids"] = new Dictionary<string, object>
+			{
+				["type"] = "array", ["description"] = "Optional GUID array. If omitted, uses current selection.",
+				["items"] = new Dictionary<string, object> { ["type"] = "string" }
+			}
+		} );
+
+	internal static Dictionary<string, object> SchemaSaveSceneAs => OzmiumSceneHelpers.S( "save_scene_as",
+		"Save the current scene to a new file path (opens Save As dialog).",
+		new Dictionary<string, object>
+		{
+			["path"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Desired file path." }
+		} );
+
+	internal static Dictionary<string, object> SchemaGetSceneUnsaved => OzmiumSceneHelpers.S( "get_scene_unsaved",
+		"Check if the current scene has unsaved changes.",
+		new Dictionary<string, object>() );
+
+	internal static Dictionary<string, object> SchemaBreakFromPrefab => OzmiumSceneHelpers.S( "break_from_prefab",
+		"Break a prefab instance's connection to its source prefab.",
+		new Dictionary<string, object>
+		{
+			["id"]   = new Dictionary<string, object> { ["type"] = "string", ["description"] = "GUID." },
+			["name"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Exact name." }
+		} );
+
+	internal static Dictionary<string, object> SchemaUpdateFromPrefab => OzmiumSceneHelpers.S( "update_from_prefab",
+		"Update a prefab instance to match its source prefab.",
+		new Dictionary<string, object>
+		{
+			["id"]   = new Dictionary<string, object> { ["type"] = "string", ["description"] = "GUID." },
+			["name"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Exact name." }
+		} );
 }
 

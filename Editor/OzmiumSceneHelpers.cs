@@ -2,13 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using Editor;
 using Sandbox;
 
 namespace SboxMcpServer;
 
 /// <summary>
-/// Shared helpers: scene resolution, object tree walking, and JSON object builders.
+/// Shared helpers: scene resolution, object tree walking, JSON arg extraction,
+/// schema builders, and other utilities used by all handler files.
 /// </summary>
 internal static class OzmiumSceneHelpers
 {
@@ -173,6 +175,35 @@ internal static class OzmiumSceneHelpers
 		return target;
 	}
 
+	/// <summary>
+	/// Like FindGo but skips objects that don't have the requested component type.
+	/// Resolves name collisions where multiple objects share the same name.
+	/// </summary>
+	internal static GameObject FindGoWithComponent<T>( Scene scene, string id, string name ) where T : Component
+	{
+		// If ID provided, try exact match first (ID is unique, no collision possible)
+		if ( !string.IsNullOrEmpty( id ) && Guid.TryParse( id, out var guid ) )
+		{
+			var byId = WalkAll( scene, true ).FirstOrDefault( g => g.Id == guid )
+			        ?? scene.Children.FirstOrDefault( g => g.Id == guid );
+			if ( byId != null && byId.Components.Get<T>() != null )
+				return byId;
+		}
+
+		// Name lookup — find first object with this name that has the component
+		if ( !string.IsNullOrEmpty( name ) )
+		{
+			return WalkAll( scene, true ).FirstOrDefault( g =>
+				string.Equals( g.Name, name, StringComparison.OrdinalIgnoreCase )
+				&& g.Components.Get<T>() != null )
+				?? scene.Children.FirstOrDefault( g =>
+				string.Equals( g.Name, name, StringComparison.OrdinalIgnoreCase )
+				&& g.Components.Get<T>() != null );
+		}
+
+		return null;
+	}
+
 	// ── Hierarchy line ──────────────────────────────────────────────────────
 
 	internal static void AppendHierarchyLine( StringBuilder sb, GameObject go, int depth, bool showChildren )
@@ -194,4 +225,78 @@ internal static class OzmiumSceneHelpers
 
 	internal static Dictionary<string, object> Rot( Rotation r ) => new()
 		{ ["pitch"] = MathF.Round( r.Pitch(), 2 ), ["yaw"] = MathF.Round( r.Yaw(), 2 ), ["roll"] = MathF.Round( r.Roll(), 2 ) };
+
+	// ── JSON helpers (shared across all handler files) ───────────────────
+
+	/// <summary>Wraps a plain text string into the MCP text-result envelope.</summary>
+	internal static object Txt( string text ) => new { content = new object[] { new { type = "text", text } } };
+
+	/// <summary>Extracts a typed value from a JsonElement, returning <paramref name="def"/> on missing/invalid.</summary>
+	internal static T Get<T>( JsonElement el, string key, T def )
+	{
+		if ( el.ValueKind == JsonValueKind.Undefined ) return def;
+		if ( !el.TryGetProperty( key, out var p ) ) return def;
+		try
+		{
+			var t = typeof( T );
+			if ( t == typeof( string ) ) return (T)(object)( p.ValueKind == JsonValueKind.Null ? null : p.GetString() );
+			if ( t == typeof( bool ) )   return (T)(object)p.GetBoolean();
+			if ( t == typeof( int ) )    return (T)(object)p.GetInt32();
+			if ( t == typeof( float ) )  return (T)(object)p.GetSingle();
+			return def;
+		}
+		catch { return def; }
+	}
+
+	/// <summary>Builds a tool definition object with name, description, and inputSchema.</summary>
+	internal static Dictionary<string, object> S( string name, string desc, Dictionary<string, object> props, string[] req = null )
+	{
+		var schema = new Dictionary<string, object> { ["type"] = "object", ["properties"] = props };
+		if ( req != null ) schema["required"] = req;
+		return new Dictionary<string, object> { ["name"] = name, ["description"] = desc, ["inputSchema"] = schema };
+	}
+
+	/// <summary>Shorthand for building a property dictionary from (key, type, description) tuples.</summary>
+	internal static Dictionary<string, object> Ps( params (string k, string type, string d)[] fields )
+	{
+		var d = new Dictionary<string, object>();
+		foreach ( var (k, tp, desc) in fields )
+			d[k] = new Dictionary<string, object> { ["type"] = tp, ["description"] = desc };
+		return d;
+	}
+
+	/// <summary>Strips a leading "Assets/" or "assets/" prefix so AssetSystem.FindByPath works.</summary>
+	internal static string NormalizePath( string path )
+	{
+		if ( path == null ) return null;
+		if ( path.StartsWith( "Assets/", StringComparison.OrdinalIgnoreCase ) )
+			path = path.Substring( "Assets/".Length );
+		return path;
+	}
+
+	// ── Selection helpers ─────────────────────────────────────────────────
+
+	/// <summary>
+	/// Returns the currently selected GameObjects in the editor, using reflection
+	/// to access the editor Selection API without hard dependencies.
+	/// </summary>
+	internal static List<GameObject> GetSelectedGameObjects()
+	{
+		var result = new List<GameObject>();
+		try
+		{
+			var session = SceneEditorSession.Active;
+			if ( session == null ) return result;
+			var selProp = session.GetType().GetProperty( "Selection",
+				System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance );
+			var selObj = selProp?.GetValue( session );
+			if ( selObj == null ) return result;
+			// SelectionSystem implements IEnumerable<object> — enumerate directly
+			if ( selObj is IEnumerable<object> objs )
+				foreach ( var o in objs )
+					if ( o is GameObject go ) result.Add( go );
+		}
+		catch { }
+		return result;
+	}
 }

@@ -22,9 +22,13 @@ public class McpServerWindow : Widget
 	private Label _sessionCountLabel;
 	private Button _toggleButton;
 	private Widget _logCanvas;
+	private ToggleSwitch _autoStartToggle;
 
 	private static readonly List<string> _logEntries = new();
 	private const int MaxLogEntries = 200;
+
+	[ConVar( "mcp_server_autostart", ConVarFlags.Saved )]
+	public static bool AutoStart { get; set; } = true;
 
 	// Open via the Editor menu
 	[Menu( "Editor", "MCP/Open MCP Panel" )]
@@ -32,6 +36,15 @@ public class McpServerWindow : Widget
 	{
 		var win = new McpServerWindow();
 		win.Show();
+	}
+
+	// Static constructor runs once when the library assembly is loaded by the editor.
+	static McpServerWindow()
+	{
+		if ( AutoStart && !McpServer.IsRunning )
+		{
+			McpServer.StartServer();
+		}
 	}
 
 	public McpServerWindow() : base( null )
@@ -108,6 +121,19 @@ public class McpServerWindow : Widget
 		statusRow.Add( _toggleButton );
 
 		root.Add( statusRow );
+
+		// ── Auto-start Row ─────────────────────────────────────────────
+		var autoRow = Layout.Row();
+		autoRow.Spacing = 8;
+		_autoStartToggle = new ToggleSwitch( "Auto-start MCP Server on editor load" );
+		_autoStartToggle.Value = AutoStart;
+		_autoStartToggle.ToolTip = $"mcp_server_autostart (default: true). Change takes effect on next editor launch.";
+		_autoStartToggle.MouseClick += () =>
+		{
+			AutoStart = _autoStartToggle.Value;
+		};
+		autoRow.Add( _autoStartToggle );
+		root.Add( autoRow );
 		root.AddSeparator();
 
 		// ── Log Header ─────────────────────────────────────────────────

@@ -25,9 +25,9 @@ internal static class OzmiumAssetHandlers
 
 	internal static object BrowseAssets( JsonElement args )
 	{
-		string typeFilter = Get( args, "type",        (string)null );
-		string nameFilter = Get( args, "nameContains",(string)null );
-		int    max        = Get( args, "maxResults",  100 );
+		string typeFilter = OzmiumSceneHelpers.Get( args, "type",        (string)null );
+		string nameFilter = OzmiumSceneHelpers.Get( args, "nameContains",(string)null );
+		int    max        = OzmiumSceneHelpers.Get( args, "maxResults",  100 );
 
 		var results  = new List<Dictionary<string, object>>();
 		int total    = 0;
@@ -61,14 +61,14 @@ internal static class OzmiumAssetHandlers
 				} );
 			}
 		}
-		catch ( Exception ex ) { return Txt( $"Error: {ex.Message}" ); }
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 
 		var summary = $"Found {results.Count} asset(s)" +
 			( !string.IsNullOrEmpty( typeFilter ) ? $" type='{typeFilter}'" : "" ) +
 			( !string.IsNullOrEmpty( nameFilter ) ? $" name='{nameFilter}'" : "" ) +
 			$" (scanned {total}).";
 
-		return Txt( JsonSerializer.Serialize( new { summary, results }, _json ) );
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new { summary, results }, _json ) );
 	}
 
 	// ── get_editor_context ─────────────────────────────────────────────────
@@ -99,7 +99,7 @@ internal static class OzmiumAssetHandlers
 
 			// Current selection
 			var sel = new List<Dictionary<string, object>>();
-			foreach ( var go in GetSelectedGameObjects() )
+			foreach ( var go in OzmiumSceneHelpers.GetSelectedGameObjects() )
 				sel.Add( new Dictionary<string, object>
 				{
 					["id"] = go.Id.ToString(), ["name"] = go.Name,
@@ -109,20 +109,20 @@ internal static class OzmiumAssetHandlers
 		}
 		catch ( Exception ex ) { ctx["editorApiError"] = ex.Message; }
 
-		return Txt( JsonSerializer.Serialize( ctx, _json ) );
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( ctx, _json ) );
 	}
 
 	// ── get_model_info ─────────────────────────────────────────────────────
 
 	internal static object GetModelInfo( JsonElement args )
 	{
-		string path = NormalizePath( Get( args, "path", (string)null ) );
-		if ( string.IsNullOrEmpty( path ) ) return Txt( "Provide 'path' (model asset path, e.g. 'models/citizen_male.vmdl')." );
+		string path = OzmiumSceneHelpers.NormalizePath( OzmiumSceneHelpers.Get( args, "path", (string)null ) );
+		if ( string.IsNullOrEmpty( path ) ) return OzmiumSceneHelpers.Txt( "Provide 'path' (model asset path, e.g. 'models/citizen_male.vmdl')." );
 
 		try
 		{
 			var model = Model.Load( path );
-			if ( model == null ) return Txt( $"Model not found: '{path}'." );
+			if ( model == null ) return OzmiumSceneHelpers.Txt( $"Model not found: '{path}'." );
 
 			var bones = new List<Dictionary<string, object>>();
 			// BoneCollection.GetBone(string) takes a name, not an index.
@@ -157,7 +157,7 @@ internal static class OzmiumAssetHandlers
 			}
 			catch { attachments.Add( new Dictionary<string, object> { ["name"] = "(attachment iteration not supported)" } ); }
 
-			return Txt( JsonSerializer.Serialize( new
+			return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new
 			{
 				path,
 				boneCount       = model.BoneCount,
@@ -166,37 +166,37 @@ internal static class OzmiumAssetHandlers
 				attachments
 			}, _json ) );
 		}
-		catch ( Exception ex ) { return Txt( $"Error loading model: {ex.Message}" ); }
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error loading model: {ex.Message}" ); }
 	}
 
 	// ── get_material_properties ────────────────────────────────────────────
 
 	internal static object GetMaterialProperties( JsonElement args )
 	{
-		string path = NormalizePath( Get( args, "path", (string)null ) );
-		if ( string.IsNullOrEmpty( path ) ) return Txt( "Provide 'path' (material asset path, e.g. 'materials/dev/dev_01.vmat')." );
+		string path = OzmiumSceneHelpers.NormalizePath( OzmiumSceneHelpers.Get( args, "path", (string)null ) );
+		if ( string.IsNullOrEmpty( path ) ) return OzmiumSceneHelpers.Txt( "Provide 'path' (material asset path, e.g. 'materials/dev/dev_01.vmat')." );
 
 		try
 		{
 			var mat = Material.Load( path );
-			if ( mat == null ) return Txt( $"Material not found: '{path}'." );
+			if ( mat == null ) return OzmiumSceneHelpers.Txt( $"Material not found: '{path}'." );
 
-			return Txt( JsonSerializer.Serialize( new
+			return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new
 			{
 				path,
 				name   = mat.Name,
 				shader = mat.ShaderName
 			}, _json ) );
 		}
-		catch ( Exception ex ) { return Txt( $"Error: {ex.Message}" ); }
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
 
 	// ── get_prefab_structure ────────────────────────────────────────────────
 
 	internal static object GetPrefabStructure( JsonElement args )
 	{
-		string path = NormalizePath( Get( args, "path", (string)null ) );
-		if ( string.IsNullOrEmpty( path ) ) return Txt( "Provide 'path' (relative prefab path, e.g. 'prefabs/player.prefab')." );
+		string path = OzmiumSceneHelpers.NormalizePath( OzmiumSceneHelpers.Get( args, "path", (string)null ) );
+		if ( string.IsNullOrEmpty( path ) ) return OzmiumSceneHelpers.Txt( "Provide 'path' (relative prefab path, e.g. 'prefabs/player.prefab')." );
 
 		try
 		{
@@ -206,112 +206,231 @@ internal static class OzmiumAssetHandlers
 			if ( asset != null && System.IO.File.Exists( asset.AbsolutePath ) )
 			{
 				var raw = System.IO.File.ReadAllText( asset.AbsolutePath );
-				return Txt( $"Raw prefab JSON for '{path}':\n{raw}" );
+				return OzmiumSceneHelpers.Txt( $"Raw prefab JSON for '{path}':\n{raw}" );
 			}
 
-			return Txt( $"Prefab not found: '{path}'." );
+			return OzmiumSceneHelpers.Txt( $"Prefab not found: '{path}'." );
 		}
-		catch ( Exception ex ) { return Txt( $"Error: {ex.Message}" ); }
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
 
 	// ── reload_asset ───────────────────────────────────────────────────────
 
 	internal static object ReloadAsset( JsonElement args )
 	{
-		string path = NormalizePath( Get( args, "path", (string)null ) );
-		if ( string.IsNullOrEmpty( path ) ) return Txt( "Provide 'path'." );
+		string path = OzmiumSceneHelpers.NormalizePath( OzmiumSceneHelpers.Get( args, "path", (string)null ) );
+		if ( string.IsNullOrEmpty( path ) ) return OzmiumSceneHelpers.Txt( "Provide 'path'." );
 
 		try
 		{
 			var asset = AssetSystem.FindByPath( path );
-			if ( asset == null ) return Txt( $"Asset not found: '{path}'." );
+			if ( asset == null ) return OzmiumSceneHelpers.Txt( $"Asset not found: '{path}'." );
 			asset.Compile( true );
-			return Txt( $"Reimport triggered for '{path}'." );
+			return OzmiumSceneHelpers.Txt( $"Reimport triggered for '{path}'." );
 		}
-		catch ( Exception ex ) { return Txt( $"Error: {ex.Message}" ); }
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
 
-	// ── Helpers ────────────────────────────────────────────────────────────
+	// ── get_component_types ────────────────────────────────────────────────
 
-	/// <summary>
-	/// Strips a leading "Assets/" or "assets/" prefix from a path so that
-	/// callers can pass either form and AssetSystem.FindByPath will work.
-	/// </summary>
-	private static string NormalizePath( string path )
+	internal static object GetComponentTypes( JsonElement args )
 	{
-		if ( path == null ) return null;
-		if ( path.StartsWith( "Assets/", StringComparison.OrdinalIgnoreCase ) )
-			path = path.Substring( "Assets/".Length );
-		return path;
-	}
+		string filter = OzmiumSceneHelpers.Get( args, "filter", (string)null );
 
-	private static object Txt( string text ) => new { content = new object[] { new { type = "text", text } } };
-
-	private static T Get<T>( JsonElement el, string key, T def )
-	{
-		if ( el.ValueKind == JsonValueKind.Undefined ) return def;
-		if ( !el.TryGetProperty( key, out var p ) ) return def;
+		var results = new List<Dictionary<string, object>>();
 		try
 		{
-			var t = typeof( T );
-			if ( t == typeof( string ) ) return (T)(object)( p.ValueKind == JsonValueKind.Null ? null : p.GetString() );
-			if ( t == typeof( bool ) )   return (T)(object)p.GetBoolean();
-			if ( t == typeof( int ) )    return (T)(object)p.GetInt32();
-			if ( t == typeof( float ) )  return (T)(object)p.GetSingle();
-			return def;
+			foreach ( var td in TypeLibrary.GetTypes<Component>() )
+			{
+				var name = td.Name;
+				if ( !string.IsNullOrEmpty( filter )
+					&& name.IndexOf( filter, StringComparison.OrdinalIgnoreCase ) < 0
+					&& ( td.TargetType?.Namespace ?? "" ).IndexOf( filter, StringComparison.OrdinalIgnoreCase ) < 0 )
+					continue;
+
+				// Skip abstract types
+				if ( td.TargetType != null && td.TargetType.IsAbstract ) continue;
+
+				results.Add( new Dictionary<string, object>
+				{
+					["name"]  = name,
+					["namespace"] = td.TargetType?.Namespace ?? ""
+				} );
+			}
 		}
-		catch { return def; }
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
+
+		results = results.OrderBy( r => r["name"]?.ToString() ).ToList();
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new
+		{
+			summary = $"Found {results.Count} component type(s)" +
+				( !string.IsNullOrEmpty( filter ) ? $" matching '{filter}'" : "" ) + ".",
+			results
+		}, _json ) );
+	}
+
+	// ── search_assets ─────────────────────────────────────────────────────
+
+	internal static object SearchAssets( JsonElement args )
+	{
+		string query   = OzmiumSceneHelpers.Get( args, "query",     (string)null );
+		string type    = OzmiumSceneHelpers.Get( args, "type",      (string)null );
+		int    max     = OzmiumSceneHelpers.Get( args, "maxResults", 50 );
+
+		if ( string.IsNullOrEmpty( query ) ) return OzmiumSceneHelpers.Txt( "Provide 'query'." );
+
+		var results = new List<Dictionary<string, object>>();
+		try
+		{
+			foreach ( var asset in AssetSystem.All )
+			{
+				if ( results.Count >= max ) break;
+				var ext     = asset.AssetType?.FileExtension ?? "";
+				var aName   = asset.Name ?? "";
+				var aPath   = asset.Path ?? "";
+				var friendly = asset.AssetType?.FriendlyName ?? ext;
+
+				// Match query against name and path
+				bool match = aName.IndexOf( query, StringComparison.OrdinalIgnoreCase ) >= 0
+				          || aPath.IndexOf( query, StringComparison.OrdinalIgnoreCase ) >= 0;
+				if ( !match ) continue;
+
+				if ( !string.IsNullOrEmpty( type ) )
+				{
+					bool typeMatch = ext.IndexOf( type, StringComparison.OrdinalIgnoreCase ) >= 0
+					                || friendly.IndexOf( type, StringComparison.OrdinalIgnoreCase ) >= 0;
+					if ( !typeMatch ) continue;
+				}
+
+				results.Add( new Dictionary<string, object>
+				{
+					["path"]         = aPath,
+					["relativePath"] = asset.RelativePath ?? aPath,
+					["name"]         = aName,
+					["type"]         = friendly,
+					["extension"]    = ext
+				} );
+			}
+		}
+		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
+
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new
+		{
+			summary = $"Found {results.Count} asset(s) matching '{query}'" +
+				( !string.IsNullOrEmpty( type ) ? $" type='{type}'" : "" ) + ".",
+			results
+		}, _json ) );
+	}
+
+	// ── get_scene_statistics ──────────────────────────────────────────────
+
+	internal static object GetSceneStatistics()
+	{
+		var scene = OzmiumSceneHelpers.ResolveScene();
+		if ( scene == null ) return OzmiumSceneHelpers.Txt( "No active scene." );
+
+		var allObjects = OzmiumSceneHelpers.WalkAll( scene, true ).ToList();
+
+		// Component type frequency
+		var compCounts = new Dictionary<string, int>( StringComparer.OrdinalIgnoreCase );
+		foreach ( var go in allObjects )
+			foreach ( var comp in go.Components.GetAll() )
+			{
+				var typeName = comp.GetType().Name;
+				compCounts.TryGetValue( typeName, out var existing );
+				compCounts[typeName] = existing + 1;
+			}
+
+		// All unique tags
+		var allTags = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
+		foreach ( var go in allObjects )
+			foreach ( var tag in go.Tags.TryGetAll() )
+				allTags.Add( tag );
+
+		// Prefab source breakdown
+		var prefabCounts = new Dictionary<string, int>( StringComparer.OrdinalIgnoreCase );
+		foreach ( var go in allObjects.Where( g => g.IsPrefabInstance && g.PrefabInstanceSource != null ) )
+		{
+			var src = go.PrefabInstanceSource;
+			prefabCounts.TryGetValue( src, out var existing );
+			prefabCounts[src] = existing + 1;
+		}
+
+		// Network mode distribution
+		var netModeCounts = new Dictionary<string, int>( StringComparer.OrdinalIgnoreCase );
+		foreach ( var go in allObjects )
+		{
+			var mode = go.NetworkMode.ToString();
+			netModeCounts.TryGetValue( mode, out var existing );
+			netModeCounts[mode] = existing + 1;
+		}
+
+		var stats = new Dictionary<string, object>
+		{
+			["sceneName"]            = scene.Name,
+			["totalObjects"]         = allObjects.Count,
+			["rootObjects"]          = scene.Children.Count,
+			["enabledObjects"]       = allObjects.Count( g => g.Enabled ),
+			["disabledObjects"]      = allObjects.Count( g => !g.Enabled ),
+			["uniqueTags"]           = allTags.OrderBy( t => t ).ToList(),
+			["componentBreakdown"]   = compCounts
+				.OrderByDescending( kv => kv.Value )
+				.Select( kv => new Dictionary<string, object> { ["type"] = kv.Key, ["count"] = kv.Value } )
+				.ToList(),
+			["prefabBreakdown"]      = prefabCounts
+				.OrderByDescending( kv => kv.Value )
+				.Select( kv => new Dictionary<string, object> { ["prefab"] = kv.Key, ["instances"] = kv.Value } )
+				.ToList(),
+			["networkModeBreakdown"] = netModeCounts
+		};
+
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( stats, _json ) );
 	}
 
 	// ── Schemas ─────────────────────────────────────────────────────────────
 
-	private static Dictionary<string, object> S( string name, string desc, Dictionary<string, object> props, string[] req = null )
-	{
-		var schema = new Dictionary<string, object> { ["type"] = "object", ["properties"] = props };
-		if ( req != null ) schema["required"] = req;
-		return new Dictionary<string, object> { ["name"] = name, ["description"] = desc, ["inputSchema"] = schema };
-	}
 	private static Dictionary<string, object> P1( string key, string type, string desc )
 		=> new Dictionary<string, object> { [key] = new Dictionary<string, object> { ["type"] = type, ["description"] = desc } };
 
-	internal static Dictionary<string, object> SchemaGetModelInfo => S( "get_model_info",
+	internal static Dictionary<string, object> SchemaGetModelInfo => OzmiumSceneHelpers.S( "get_model_info",
 		"Return bone names, attachment points, and sequence count for a .vmdl model.",
 		P1( "path", "string", "Model path (e.g. 'models/citizen_male.vmdl')." ),
 		new[] { "path" } );
 
-	internal static Dictionary<string, object> SchemaGetMaterialProperties => S( "get_material_properties",
+	internal static Dictionary<string, object> SchemaGetMaterialProperties => OzmiumSceneHelpers.S( "get_material_properties",
 		"Return shader name and surface properties for a .vmat material.",
 		P1( "path", "string", "Material path (e.g. 'materials/dev/dev_01.vmat')." ),
 		new[] { "path" } );
 
-	internal static Dictionary<string, object> SchemaGetPrefabStructure => S( "get_prefab_structure",
+	internal static Dictionary<string, object> SchemaGetPrefabStructure => OzmiumSceneHelpers.S( "get_prefab_structure",
 		"Return the full object/component hierarchy of a .prefab file without opening it.",
 		P1( "path", "string", "Prefab path (e.g. 'prefabs/player.prefab')." ),
 		new[] { "path" } );
 
-	internal static Dictionary<string, object> SchemaReloadAsset => S( "reload_asset",
+	internal static Dictionary<string, object> SchemaReloadAsset => OzmiumSceneHelpers.S( "reload_asset",
 		"Force reimport/recompile of a specific asset — useful after modifying source files on disk.",
 		P1( "path", "string", "Asset path to reimport." ),
 		new[] { "path" } );
 
-	private static IEnumerable<GameObject> GetSelectedGameObjects()
-	{
-		var result = new List<GameObject>();
-		try
+	internal static Dictionary<string, object> SchemaGetComponentTypes => OzmiumSceneHelpers.S( "get_component_types",
+		"List all available component types via TypeLibrary, so AI knows what components can be added.",
+		new Dictionary<string, object>
 		{
-			var session = SceneEditorSession.Active;
-			if ( session == null ) return result;
-			var selProp = session.GetType().GetProperty( "Selection",
-				System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance );
-			var selObj = selProp?.GetValue( session );
-			if ( selObj == null ) return result;
-			var objsProp = selObj.GetType().GetProperty( "Objects" );
-			if ( objsProp?.GetValue( selObj ) is IEnumerable<object> objs )
-				foreach ( var o in objs )
-					if ( o is GameObject go ) result.Add( go );
-		}
-		catch { }
-		return result;
-	}
+			["filter"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Optional filter string to match against type name or namespace." }
+		} );
+
+	internal static Dictionary<string, object> SchemaSearchAssets => OzmiumSceneHelpers.S( "search_assets",
+		"Search assets by content (file extension filter + substring matching on name and path).",
+		new Dictionary<string, object>
+		{
+			["query"]      = new Dictionary<string, object> { ["type"] = "string",  ["description"] = "Search query (matches name and path)." },
+			["type"]       = new Dictionary<string, object> { ["type"] = "string",  ["description"] = "Optional file type filter (e.g. 'prefab', 'vmdl', 'vmat')." },
+			["maxResults"] = new Dictionary<string, object> { ["type"] = "integer", ["description"] = "Max results (default 50)." }
+		},
+		new[] { "query" } );
+
+	internal static Dictionary<string, object> SchemaGetSceneStatistics => OzmiumSceneHelpers.S( "get_scene_statistics",
+		"Enhanced scene summary with component type frequency, prefab breakdown, network mode distribution, and tags.",
+		new Dictionary<string, object>() );
 }
 

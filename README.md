@@ -7,7 +7,7 @@ Connect AI coding assistants to the S&box editor using the [Model Context Protoc
 ## Features
 
 - SSE-based MCP server running on `localhost:8098`
-- **31 tools** across five categories: scene read, scene write, asset queries, editor control, and console access
+- **72 tools** across twelve categories: scene read, scene write, asset queries, editor control, console access, mesh editing, lighting, physics, audio, camera, effects & environment, and utilities
 - Disabled objects and disabled subtrees are fully visible to all query tools
 - Built-in Editor panel with live server status, session count, and an activity log
 - Localhost-only — nothing leaves your machine
@@ -75,6 +75,21 @@ Move a GameObject under a new parent. Pass `parentId="null"` to move to scene ro
 #### `set_game_object_tags`
 Set, add, or remove tags on a GameObject. Use `set` (array) to replace all tags, or `add`/`remove` arrays for incremental changes.
 
+#### `set_game_object_transform`
+Set position, rotation, and scale of a GameObject in one call. Accepts `position`, `rotation`, and `scale` objects. Requires `id` or `name`.
+
+#### `duplicate_game_object`
+Clone a GameObject with optional new position and name. Accepts `id`/`name`, `position`, and `newName`.
+
+#### `set_game_object_enabled`
+Toggle a GameObject's enabled state. Pass `id`/`name` and `enabled`; omit `enabled` to toggle.
+
+#### `set_game_object_name`
+Rename a GameObject. Requires `newName` and `id` or `name`.
+
+#### `set_component_enabled`
+Toggle a component's enabled state. Requires `componentType`, `enabled`, and `id` or `name`.
+
 #### `instantiate_prefab`
 Spawn a prefab at a world position. Accepts `path` (prefab asset path), `x/y/z`, and optional `parentId`. Use `browse_assets` with `type="prefab"` to find valid paths first.
 
@@ -109,6 +124,15 @@ Return the full object/component hierarchy of a `.prefab` file without opening i
 #### `reload_asset`
 Force reimport/recompile of a specific asset — useful after modifying source files on disk. Requires `path`.
 
+#### `get_component_types`
+List all available component types via `TypeLibrary`, so AI knows what components can be added. Supports a `filter` parameter.
+
+#### `search_assets`
+Search assets by content (file extension filter + substring matching on name and path). Supports `query`, `type`, and `maxResults`.
+
+#### `get_scene_statistics`
+Enhanced scene summary with component type frequency, prefab breakdown, network mode distribution, and tags.
+
 ---
 
 ### Editor Control
@@ -131,6 +155,15 @@ Press the Stop button in the editor.
 #### `get_editor_log`
 Return recent log lines captured from the editor output. Accepts `lines` (default 50).
 
+#### `get_selected_objects`
+Return the currently selected objects in the editor.
+
+#### `set_selected_objects`
+Select multiple objects at once. Requires `ids` (array of GUIDs).
+
+#### `clear_selection`
+Clear the editor selection.
+
 ---
 
 ### Console
@@ -140,6 +173,118 @@ List all `[ConVar]`-attributed console variables registered in the game, with th
 
 #### `run_console_command`
 Get or set a console variable. Pass just the name to read its current value; pass `name value` to set it. Errors are returned as text rather than thrown as exceptions.
+
+---
+
+### Mesh Editing
+
+#### `create_block`
+Creates a primitive block mesh using `PolygonMesh`. Compatible with S&box mesh editing tools. Accepts `x/y/z` (position), `sizeX/Y/Z`, `name`, and `materialPath`.
+
+#### `set_face_material`
+Applies a material to a specific face or all faces of a mesh. Requires `materialPath`, optional `faceIndex` (-1 for all faces) and `gameObjectId`/`name`.
+
+#### `set_texture_parameters`
+Sets texture mapping parameters (UV axes and scale) for faces. Accepts `uAxisX/Y/Z`, `vAxisX/Y/Z`, `scaleU`, `scaleV`, and `faceIndex`.
+
+#### `set_vertex_position`
+Sets the position of a vertex by index for displacement/sculpting. Requires `vertexIndex`, `x/y/z`, and `gameObjectId`/`name`.
+
+#### `set_vertex_color`
+Sets the vertex color for vertex painting. Requires `vertexIndex`, `r/g/b/a` (0-1), and `gameObjectId`/`name`.
+
+#### `set_vertex_blend`
+Sets the vertex blend weights for terrain/texturing. Requires `vertexIndex`, `r/g/b/blend` (0-1), and `gameObjectId`/`name`.
+
+#### `get_mesh_info`
+Queries detailed information about a mesh including vertex/face counts, bounds, and per-face materials. Requires `gameObjectId` or `name`.
+
+---
+
+### Lighting
+
+#### `create_light`
+Creates a GO with a light component (`PointLight`, `SpotLight`, or `DirectionalLight`). Accepts `type`, `x/y/z`, `color`, `shadows`, `radius`, `attenuation`, `coneOuter`, `coneInner`, and `name`.
+
+#### `configure_light`
+Sets properties on an existing Light component. Supports `color`, `shadows`, `radius`, `attenuation`, `coneOuter`, `coneInner`, `fogMode`, `fogStrength`, and `skyIndirectLighting`.
+
+#### `create_sky_box`
+Creates a GO with a `SkyBox2D` component for sky rendering. Accepts `skyMaterial` path, `tint` color, and `skyIndirectLighting` toggle.
+
+#### `set_sky_box`
+Configures an existing `SkyBox2D` component. Supports `skyMaterial`, `tint`, and `skyIndirectLighting`.
+
+#### `create_ambient_light`
+Creates a scene-level `AmbientLight` for global ambient illumination. Accepts `color`, `x/y/z`, and `name`.
+
+---
+
+### Physics
+
+#### `add_collider`
+Adds a collider component (`BoxCollider`, `SphereCollider`, `CapsuleCollider`, or `ModelCollider`) to a GameObject with configured properties including `center`, `size`/`radius`, `friction`, `elasticity`, `isTrigger`, and `surfaceVelocity`.
+
+#### `configure_collider`
+Modifies properties on an existing Collider component. Supports all the same properties as `add_collider`.
+
+#### `add_rigidbody`
+Adds a `Rigidbody` component to a GameObject for physics simulation. Accepts `mass`, `gravity`, `gravityScale`, `linearDamping`, and `angularDamping`.
+
+---
+
+### Audio
+
+#### `create_sound_point`
+Creates a GO with a `SoundPointComponent` for spatial audio. Accepts `x/y/z`, `name`, `soundEvent` path, `volume`, `pitch`, `playOnStart`, and `repeat`.
+
+#### `configure_sound`
+Configures an existing `BaseSoundComponent` on a GameObject. Supports `soundEvent`, `volume`, `pitch`, `playOnStart`, `repeat`, `distanceAttenuation`, and `distance`.
+
+---
+
+### Camera
+
+#### `create_camera`
+Creates a GO with a `CameraComponent`. Accepts `x/y/z`, `pitch/yaw/roll`, `name`, `fov`, `zNear`, `zFar`, `isMainCamera`, `orthographic`, and `orthographicHeight`.
+
+#### `configure_camera`
+Configures an existing `CameraComponent`. Supports `fov`, `zNear`, `zFar`, `isMainCamera`, `orthographic`, `orthographicHeight`, `backgroundColor`, and `priority`.
+
+---
+
+### Effects & Environment
+
+#### `create_particle_effect`
+Creates a GO with a `ParticleEffect` component. Accepts `x/y/z`, `name`, `maxParticles`, `lifetime`, `timeScale`, and `preWarm`.
+
+#### `configure_particle_effect`
+Sets properties on an existing `ParticleEffect`. Supports `maxParticles`, `lifetime`, `timeScale`, and `preWarm`.
+
+#### `create_fog_volume`
+Creates a GO with a fog volume component (`GradientFog` or `VolumetricFogVolume`). Accepts `fogType`, `color`, `height`, `startDistance`, `endDistance`, `falloffExponent`, and `strength`.
+
+#### `configure_post_processing`
+Creates a `PostProcessVolume` on an existing or new GO for post-processing effects. Accepts `priority`, `blendWeight`, `blendDistance`, and `editorPreview`.
+
+#### `create_environment_light`
+Creates a complete environment lighting setup in one call: `DirectionalLight` (sun) + `AmbientLight` + `SkyBox2D`. Accepts `sunDirection` (pitch yaw roll), `sunColor`, `ambientColor`, and `skyMaterial`.
+
+---
+
+### Utilities
+
+#### `get_asset_dependencies`
+Returns all assets referenced by a given asset (materials, textures, etc.). Requires `assetPath`.
+
+#### `batch_transform`
+Applies a position offset `{x,y,z}` to multiple objects at once. Requires `ids` (array of GUIDs) and `position`.
+
+#### `copy_component`
+Copies a component from one GameObject to another. Requires `sourceId`, `targetId`, and `componentType`.
+
+#### `get_object_bounds`
+Returns the world-space bounding box of a GameObject. Requires `id` or `name`.
 
 ---
 
@@ -191,7 +336,7 @@ git submodule update --remote Libraries/ozmium.oz_mcp
 }
 ```
 
-5. **Done.** Your AI assistant can now call all 31 tools directly.
+5. **Done.** Your AI assistant can now call all 72 tools directly.
 
 ---
 
@@ -213,6 +358,13 @@ git submodule update --remote Libraries/ozmium.oz_mcp
 | `OzmiumWriteHandlers.cs` | Tool logic for all scene-write tools (create, add/remove component, set property, destroy, reparent, tags, instantiate, save, undo/redo) — also owns write tool schemas |
 | `OzmiumAssetHandlers.cs` | Tool logic for asset-query tools (browse, model info, material, prefab structure, reload) — also owns asset tool schemas |
 | `OzmiumEditorHandlers.cs` | Tool logic for editor-control tools (select, open asset, play state, play/stop, editor log, console commands) — also owns editor tool schemas |
+| `MeshEditHandlers.cs` | Mesh editing tools (create block, face materials, texture params, vertex position/color/blend, mesh info) |
+| `LightingToolHandlers.cs` | Lighting tools (create/configure light, sky box, ambient light) |
+| `PhysicsToolHandlers.cs` | Physics tools (add/configure collider, add rigidbody) |
+| `AudioToolHandlers.cs` | Audio tools (create/configure sound point) |
+| `CameraToolHandlers.cs` | Camera tools (create/configure camera) |
+| `EffectToolHandlers.cs` | Effect & environment tools (particle effects, fog volumes, post-processing, environment light) |
+| `UtilityToolHandlers.cs` | Utility tools (asset dependencies, batch transform, copy component, object bounds) |
 | `AssetToolHandlers.cs` | Legacy asset handler (superseded by `OzmiumAssetHandlers`) |
 | `ConsoleToolHandlers.cs` | Tool logic for `list_console_commands` and `run_console_command` |
 | `ToolHandlerBase.cs` | Shared handler utilities (`TextResult`, `AppendHierarchyLine`) |
@@ -236,3 +388,8 @@ To add a new tool: add its schema (either inline in the handler file or in a `*T
 - **`run_console_command`** uses `ConsoleSystem.GetValue`/`SetValue` and is dispatched outside the normal async path so that engine exceptions are reliably catchable.
 - **`get_prefab_structure`** reads the raw prefab JSON from disk via `AssetSystem.FindByPath` + `File.ReadAllText`, since `PrefabFile` does not expose a live scene when not open in the editor.
 - **`get_editor_log`** captures log lines into a concurrent ring buffer (`MaxLogLines = 500`) fed by the editor's log callback.
+
+---
+
+## Acknowledgments
+A special thank you to **Oldschoola** for their outstanding contributions and ideas that helped shape and improve this project!
