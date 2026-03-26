@@ -9,6 +9,7 @@
 *.slnx
 *.scene_d
 *.csproj
+!modelcontextprotocol.csproj
 
 # Build artifacts
 obj/
