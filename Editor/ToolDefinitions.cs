@@ -97,5 +97,20 @@ internal static class ToolDefinitions
 
 		// ── Game (omnibus) ────────────────────────────────────────────────
 		GameToolHandlers.SchemaCreateGameEntity,
+
+		// ── Scene spatial queries (omnibus) ───────────────────────────────
+		SceneQueryToolHandlers.SchemaSceneTrace,
+
+		// ── Terrain (omnibus) ────────────────────────────────────────────
+		TerrainToolHandlers.SchemaManageTerrain,
+
+		// ── Procedural mesh (omnibus) ────────────────────────────────────
+		ProceduralMeshToolHandlers.SchemaBuildProceduralMesh,
+
+		// ── Material editing (omnibus) ──────────────────────────────────
+		MaterialToolHandlers.SchemaManageMaterial,
+
+		// ── Batch operations (omnibus) ──────────────────────────────────
+		BatchToolHandlers.SchemaBatchOperations,
 	};
 }

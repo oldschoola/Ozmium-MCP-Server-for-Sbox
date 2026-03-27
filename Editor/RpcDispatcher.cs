@@ -145,6 +145,16 @@ internal static class RpcDispatcher
 						"create_render_entity"       => RenderingToolHandlers.CreateRenderEntity( args ),
 						// ── Game (omnibus) ────────────────────────────────────────────────
 						"create_game_entity"         => GameToolHandlers.CreateGameEntity( args ),
+						// ── Scene spatial queries (omnibus) ──────────────────────────────
+						"scene_trace"                => SceneQueryToolHandlers.SceneTrace( args ),
+						// ── Terrain (omnibus) ───────────────────────────────────────────
+						"manage_terrain"             => TerrainToolHandlers.ManageTerrain( args ),
+						// ── Procedural mesh (omnibus) ───────────────────────────────────
+						"build_procedural_mesh"      => ProceduralMeshToolHandlers.BuildProceduralMesh( args ),
+						// ── Material editing (omnibus) ─────────────────────────────────
+						"manage_material"            => MaterialToolHandlers.ManageMaterial( args ),
+						// ── Batch operations (omnibus) ─────────────────────────────────
+						"batch_operations"           => BatchToolHandlers.BatchOperations( args ),
 						_                             => throw new InvalidOperationException( $"Tool '{toolName}' not found" )
 					};
 				}

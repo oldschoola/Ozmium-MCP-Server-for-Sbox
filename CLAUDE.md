@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Ozmium MCP Server is an S&box editor library that exposes a [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server, allowing AI coding assistants (Claude Desktop, Cursor, etc.) to query and manipulate the S&box editor scene in real time over SSE on `localhost:8098`. It provides 95 tools across twelve categories: scene read, scene write, asset queries, editor control, console access, mesh editing, lighting, physics, audio, camera, effects & environment, and utilities.
+Ozmium MCP Server is an S&box editor library that exposes a [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server, allowing AI coding assistants (Claude Desktop, Cursor, etc.) to query and manipulate the S&box editor scene in real time over SSE on `localhost:8098`. It provides 64 tools across seventeen categories: scene read, scene write, asset queries, editor control, console access, mesh editing, lighting, physics, audio, camera, effects & environment, utilities, navigation, rendering, game entities, scene queries, terrain, procedural mesh, material editing, and batch operations.
 
 ## Build
 
@@ -48,6 +48,11 @@ AI Client → HTTP POST /sse → SboxMcpServer (HTTP listener)
 | `ToolDefinitions.cs` | Aggregates all schemas into `All` array for `tools/list` |
 | `ToolHandlerBase.cs` | Shared utilities (`TextResult`, `AppendHierarchyLine`) |
 | `McpServerWindow.cs` | Editor UI panel with live status and colorized activity log |
+| `SceneQueryToolHandlers.cs` | Scene spatial query tool (ray cast, sweep, overlap, terrain height) |
+| `TerrainToolHandlers.cs` | Terrain creation & editing (heightmap, splatmap, materials) |
+| `ProceduralMeshToolHandlers.cs` | Procedural geometry (custom meshes, ramps, cylinders, arches, extrude) |
+| `MaterialToolHandlers.cs` | Material parameter editing (shader params, texture swap, model overrides) |
+| `BatchToolHandlers.cs` | Bulk operations (batch enable/delete/tag/material, grid duplication) |
 
 ### Adding a New Tool
 

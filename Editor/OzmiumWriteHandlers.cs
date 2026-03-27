@@ -544,7 +544,7 @@ internal static class OzmiumWriteHandlers
 		return null;
 	}
 
-	private static object ConvertJsonValue( JsonElement el, Type targetType )
+	internal static object ConvertJsonValue( JsonElement el, Type targetType )
 	{
 		if ( targetType == typeof( string ) )
 			return el.ValueKind == JsonValueKind.String ? el.GetString() : el.GetRawText();
