@@ -112,5 +112,23 @@ internal static class ToolDefinitions
 
 		// ── Batch operations (omnibus) ──────────────────────────────────
 		BatchToolHandlers.SchemaBatchOperations,
+
+		// ── Build automation (omnibus) ────────────────────────────────────
+		BuildAutomationToolHandlers.SchemaBuildAutomation,
+
+		// ── Zone management (omnibus) ────────────────────────────────────
+		ZoneToolHandlers.SchemaManageZones,
+
+		// ── Visibility & culling (omnibus) ───────────────────────────────
+		VisibilityToolHandlers.SchemaManageVisibility,
+
+		// ── NavMesh management (omnibus) ─────────────────────────────────
+		NavMeshToolHandlers.SchemaManageNavmesh,
+
+		// ── Game entity config (omnibus) ─────────────────────────────────
+		GameEntityConfigToolHandlers.SchemaConfigureGameEntities,
+
+		// ── Scene data (omnibus) ─────────────────────────────────────────
+		SceneDataToolHandlers.SchemaManageSceneData,
 	};
 }

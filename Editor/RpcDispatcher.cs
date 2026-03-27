@@ -155,6 +155,18 @@ internal static class RpcDispatcher
 						"manage_material"            => MaterialToolHandlers.ManageMaterial( args ),
 						// ── Batch operations (omnibus) ─────────────────────────────────
 						"batch_operations"           => BatchToolHandlers.BatchOperations( args ),
+						// ── Build automation (omnibus) ────────────────────────────────
+						"build_automation"           => BuildAutomationToolHandlers.BuildAutomation( args ),
+						// ── Zone management (omnibus) ────────────────────────────────
+						"manage_zones"               => ZoneToolHandlers.ManageZones( args ),
+						// ── Visibility & culling (omnibus) ──────────────────────────
+						"manage_visibility"          => VisibilityToolHandlers.ManageVisibility( args ),
+						// ── NavMesh management (omnibus) ─────────────────────────────
+						"manage_navmesh"             => NavMeshToolHandlers.ManageNavmesh( args ),
+						// ── Game entity config (omnibus) ─────────────────────────────
+						"configure_game_entities"    => GameEntityConfigToolHandlers.ConfigureGameEntities( args ),
+						// ── Scene data (omnibus) ─────────────────────────────────────
+						"manage_scene_data"          => SceneDataToolHandlers.ManageSceneData( args ),
 						_                             => throw new InvalidOperationException( $"Tool '{toolName}' not found" )
 					};
 				}

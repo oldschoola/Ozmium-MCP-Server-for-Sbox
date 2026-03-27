@@ -7,7 +7,7 @@ Connect AI coding assistants to the S&box editor using the [Model Context Protoc
 ## Features
 
 - SSE-based MCP server running on `localhost:8098`
-- **59 tools** across twelve categories: scene read, scene write, asset queries, editor control, console access, mesh editing, lighting, physics, audio, camera, effects & environment, and utilities
+- **65 tools** across eighteen categories: scene read, scene write, asset queries, editor control, console access, mesh editing, lighting, physics, audio, camera, effects & environment, utilities, navigation, rendering, game entities, scene queries, terrain, procedural mesh, material editing, batch operations, build automation, zone management, visibility, navmesh, game entity config, and scene data
 - Disabled objects and disabled subtrees are fully visible to all query tools
 - Built-in Editor panel with live server status, session count, and an activity log
 - Localhost-only — nothing leaves your machine
@@ -140,6 +140,8 @@ Omnibus tool for editor selection. Operations:
 - `"select_many"` — Select multiple objects via `ids` array
 - `"clear"` — Clear the editor selection
 - `"get_selected"` — Return the currently selected objects
+- `"select_by_tag"` — Select all objects matching a tag
+- `"select_children"` — Select all children (recursive) of a parent object
 
 #### `manage_editor_state`
 Omnibus tool for editor state control. Operations:
@@ -147,6 +149,7 @@ Omnibus tool for editor state control. Operations:
 - `"stop_play"` — Press the Stop button
 - `"get_play_state"` — Returns `"Playing"` or `"Stopped"`
 - `"save_scene"` — Save the currently open scene or prefab to disk
+- `"get_scene_info"` — Return the current scene file path, name, and whether it's a prefab session
 
 #### `open_asset`
 Open an asset in its default editor (scene, prefab, material, etc.). Requires `path`.
@@ -245,6 +248,7 @@ Omnibus tool for audio. Operations:
 Omnibus tool for cameras. Operations:
 - `"create_camera"` — Create a GO with a CameraComponent
 - `"configure_camera"` — Configure an existing CameraComponent
+- `"list_cameras"` — List all CameraComponents in the scene with their properties
 
 ---
 
@@ -278,6 +282,87 @@ Copies a component from one GameObject to another. Requires `sourceId`, `targetI
 
 #### `get_object_bounds`
 Returns the world-space bounding box of a GameObject. Requires `id` or `name`.
+
+---
+
+### Build Automation
+
+#### `build_automation`
+Omnibus tool for scene building automation. Operations:
+- `"scatter_objects"` — Place N prefab instances randomly in a 3D bounding volume. Supports random rotation/scale, ground alignment via raycast, optional parent, name prefix, and reproducible seed. Count capped at 500.
+- `"replace_prefab_instances"` — Bulk replace all instances of one prefab with another. Collects source instances first, then destroys and replaces each. Preserves position/rotation/scale by default.
+- `"align_to_ground"` — Drop objects to ground/terrain via downward raycast. Accepts an array of GUIDs, vertical offset, and max raycast distance.
+- `"randomize_transforms"` — Bulk transform randomization. Randomize rotation on X/Y/Z axes independently and/or scale uniformly. Supports reproducible seed.
+- `"snap_to_grid"` — Snap object positions to a configurable grid. Supports per-axis snapping (X/Y/Z), grid size, and origin offset. Useful for aligning buildings or city blocks.
+- `"distribute_along_line"` — Place N prefab instances evenly between two points via linear interpolation. Supports ground alignment, look-along-path orientation, random Y rotation, optional parent, and name prefix.
+- `"match_height"` — Set all specified objects to the same Y height. Either provide an explicit `height` value or set `useAverage=true` to compute the average Y across all selected objects.
+
+---
+
+### Zone Management
+
+#### `manage_zones`
+Omnibus tool for gameplay zone/area management. Operations:
+- `"create_zone_marker"` — Create an invisible GO tagged as a gameplay zone (buy_zone, safe_zone, jail_area, no_pvp, spawn_zone, no_build). Tags integrate with existing tag-based querying.
+- `"create_trigger_volume"` — Create a GO with a BoxCollider configured as a trigger volume.
+- `"configure_trigger_volume"` — Modify an existing trigger volume's size, trigger state, and enabled state.
+- `"tag_objects_in_volume"` — Find objects within a box or sphere around a target and apply a tag. Uses physics overlap queries.
+- `"list_zones"` — List all objects with `zone:*` tags, optionally filtered by zone type.
+- `"remove_zone_tag"` — Remove a zone tag from an object.
+- `"get_objects_in_zone"` — Find all objects physically inside zone markers using box overlap queries.
+
+---
+
+### Visibility & Culling
+
+#### `manage_visibility`
+Omnibus tool for object visibility and render culling. Operations:
+- `"create_culling_box"` — Create a `SceneCullingBox` for performance culling (Inside mode hides objects inside the box, Outside mode hides objects outside all boxes).
+- `"delete_culling_box"` — Delete a tracked culling box and its parent GO.
+- `"list_culling_boxes"` — List all tracked culling boxes with positions, sizes, and modes.
+- `"set_editor_only"` — Add/remove the `editor_only` tag on an object (hidden during gameplay).
+- `"list_editor_only"` — List all objects with the `editor_only` tag.
+- `"hide_in_game"` — Bulk-add `editor_only` tag to multiple objects via GUIDs array.
+
+---
+
+### NavMesh Management
+
+#### `manage_navmesh`
+Omnibus tool for NavMesh system management. Operations:
+- `"get_navmesh_status"` — Returns enabled, isDirty, isGenerating, and agent parameter values.
+- `"configure_navmesh"` — Set agent parameters (height, radius, step size, max slope) and enabled state.
+- `"mark_dirty"` — Mark the navmesh as dirty so it rebuilds over the next few frames (deferred, safe in sync handler).
+- `"regenerate_area"` — Trigger bounded tile regeneration around a point with a given radius (async, fire-and-forget).
+- `"toggle_navmesh"` — Enable or disable the navmesh system.
+- `"get_navmesh_config"` — Return full navmesh configuration as JSON.
+
+---
+
+### Game Entity Configuration
+
+#### `configure_game_entities`
+Omnibus tool for high-level game entity configuration with domain-specific property groups. Unlike `set_component_property`, this provides preset configurations. Does NOT create entities (use `create_game_entity` for that). Operations:
+- `"configure_door"` — Set DarkRP door properties (isPurchasable, isOwnable, isLocked, buyAmount, doorGroups, blacklistedGroups) via reflection.
+- `"configure_spawn_point"` — Set team tags and color tint on spawn points.
+- `"configure_trigger"` — Configure TriggerHurt properties (damage, rate, damageTags, startEnabled).
+- `"configure_prop"` — Configure Prop properties (health, isStatic, tint, bodyGroups).
+- `"configure_world_panel"` — Configure WorldPanel display for shop signs (panelSize, renderScale, lookAtCamera, interactionRange).
+- `"configure_chair"` — Configure BaseChair interaction (sitPose, sitHeight, tooltipTitle).
+- `"configure_dresser"` — Configure NPC appearance via Dresser component (source, manualHeight, manualTint, manualAge, applyHeightScale).
+
+---
+
+### Scene Data
+
+#### `manage_scene_data`
+Omnibus tool for scene serialization, cloning, comparison, and network config. Enables scene templates and data-driven workflows. Operations:
+- `"serialize_objects"` — Serialize one or more GameObjects to JSON. Accepts `ids` array or uses editor selection if omitted.
+- `"deserialize_objects"` — Deserialize objects from a JSON string back into the scene. Supports single object or array. Optional position override and parent.
+- `"clone_with_properties"` — Deep-clone an object and apply property overrides. Uses `"componentType.propertyName": value` format in the `overrides` object.
+- `"compare_objects"` — Compare two GameObjects: name, enabled, tags, children count, component types, transform, network mode. Set `deep=true` for serialized JSON comparison.
+- `"batch_set_network_mode"` — Set `NetworkMode` (Never, Object, Snapshot) on multiple objects at once.
+- `"get_serialized"` — Return the full serialized JSON of a single GameObject.
 
 ---
 
@@ -329,7 +414,7 @@ git submodule update --remote Libraries/ozmium.oz_mcp
 }
 ```
 
-5. **Done.** Your AI assistant can now call all 59 tools directly.
+5. **Done.** Your AI assistant can now call all 65 tools directly.
 
 ---
 
@@ -361,6 +446,12 @@ git submodule update --remote Libraries/ozmium.oz_mcp
 | `NavigationToolHandlers.cs` | Navigation tools (nav mesh agent, link, area) |
 | `RenderingToolHandlers.cs` | Rendering omnibus tool (create_render_entity) |
 | `GameToolHandlers.cs` | Game omnibus tool (create_game_entity) |
+| `BuildAutomationToolHandlers.cs` | Build automation (scatter prefabs, replace prefab instances, align to ground, randomize transforms) |
+| `ZoneToolHandlers.cs` | Zone management (zone markers, trigger volumes, tag objects in zones, list/query zones) |
+| `VisibilityToolHandlers.cs` | Visibility & culling (culling boxes, editor-only tags, bulk hide) |
+| `NavMeshToolHandlers.cs` | NavMesh management (status, config, dirty, regenerate area, toggle) |
+| `GameEntityConfigToolHandlers.cs` | Game entity config (doors, spawn points, triggers, props, panels, chairs, dressers) |
+| `SceneDataToolHandlers.cs` | Scene data (serialize, deserialize, clone with overrides, compare, network mode) |
 | `AssetToolHandlers.cs` | Legacy asset handler (superseded by `OzmiumAssetHandlers`) |
 | `ConsoleToolHandlers.cs` | Tool logic for `list_console_commands` and `run_console_command` |
 | `ToolHandlerBase.cs` | Shared handler utilities (`TextResult`, `AppendHierarchyLine`) |
