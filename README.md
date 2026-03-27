@@ -202,6 +202,30 @@ Queries detailed information about a mesh including vertex/face counts, bounds, 
 
 ---
 
+### Terrain
+
+#### `manage_terrain`
+Omnibus tool for terrain creation, editing, painting, and analysis. Operations:
+- `"create"` — Create a new terrain with resolution, size, and height. Tags the GO with `"terrain"`.
+- `"get_info"` — Return terrain metadata (resolution, size, height, materials list).
+- `"get_height"` — Sample world height at an XZ position.
+- `"set_height"` — Set height in a brush radius with smoothstep falloff.
+- `"flatten"` — Flatten terrain to a target height in a brush radius.
+- `"paint_material"` — Paint splatmap materials (base/overlay texture IDs, blend factor) in a brush radius.
+- `"get_material_at"` — Read the splatmap material at an XZ position.
+- `"get_normal"` — Surface normal, slope angle (degrees), compass direction of downhill face, and `suitableForBuilding` flag (slope vs `maxSlope` threshold).
+- `"sample_heights"` — Batch height sampling. Accepts an array of `{x, z}` points, returns an array of `{x, z, height}`.
+- `"get_height_profile"` — Sample heights along a line from start to end at N steps. Returns min/max height range.
+- `"find_flat_areas"` — BFS flood-fill to find connected flat regions within a search radius. Filters by `maxSlope` and `minSize` (texel count). Returns center position, average height, size, and approximate diameter per area.
+- `"get_terrain_statistics"` — Overall terrain metrics: min/max/average height, height range, average/max slope, texel count and size.
+- `"smooth"` — Smooth terrain in a brush area using 3x3 neighborhood averaging from a snapshot buffer. Strength controls blend intensity.
+- `"apply_noise"` — Apply multi-octave FBM Perlin noise (`Noise.Fbm`) to generate natural-looking terrain. Supports frequency, amplitude, octaves, and seed. Set `radius=0` (default) to apply to the entire terrain, or specify a brush center/size.
+- `"raise"` — Raise terrain by a relative amount (positive = up) with smoothstep falloff. Unlike `set_height` which sets an absolute target.
+- `"terrace"` — Create stepped terraces by quantizing heights to discrete steps. `blendWidth` controls edge smoothing between steps (0 = hard cliffs, 0.5 = no terracing).
+- `"erode"` — Simple thermal erosion that simulates material sliding down slopes above a talus angle threshold. Uses double-buffered iterations to prevent directional bias, with smoothstep falloff blending at brush edges.
+
+---
+
 ### Lighting
 
 #### `manage_lighting`
@@ -437,6 +461,7 @@ git submodule update --remote Libraries/ozmium.oz_mcp
 | `OzmiumAssetHandlers.cs` | Tool logic for asset-query tools (browse, model info, material, prefab structure, reload) — also owns asset tool schemas |
 | `OzmiumEditorHandlers.cs` | Tool logic for editor-control tools (selection, editor state, open asset, editor log) — also owns editor tool schemas |
 | `MeshEditHandlers.cs` | Mesh editing tools (create block, edit_mesh omnibus, mesh info) |
+| `TerrainToolHandlers.cs` | Terrain creation, editing, painting, and analysis (manage_terrain omnibus — 17 operations) |
 | `LightingToolHandlers.cs` | Lighting omnibus tool (manage_lighting) |
 | `PhysicsToolHandlers.cs` | Physics omnibus tool (manage_physics) |
 | `AudioToolHandlers.cs` | Audio omnibus tool (manage_audio) |
