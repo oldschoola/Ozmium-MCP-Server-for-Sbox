@@ -410,12 +410,15 @@ internal static class SceneDataToolHandlers
 		var scene = OzmiumSceneHelpers.ResolveScene();
 		if ( scene == null ) return OzmiumSceneHelpers.Txt( "No active scene." );
 
-		string id = OzmiumSceneHelpers.Get( args, "id", (string)null );
-		string name = OzmiumSceneHelpers.Get( args, "name", (string)null );
+		// Support both id/name and idA/nameA (AI sometimes sends compare_objects params)
+		string id = OzmiumSceneHelpers.Get( args, "id", (string)null )
+		           ?? OzmiumSceneHelpers.Get( args, "idA", (string)null );
+		string name = OzmiumSceneHelpers.Get( args, "name", (string)null )
+		            ?? OzmiumSceneHelpers.Get( args, "nameA", (string)null );
 		bool includeChildren = OzmiumSceneHelpers.Get( args, "includeChildren", true );
 
 		var go = OzmiumSceneHelpers.FindGo( scene, id, name );
-		if ( go == null ) return OzmiumSceneHelpers.Txt( "Object not found." );
+		if ( go == null ) return OzmiumSceneHelpers.Txt( $"Object not found: id='{id}' name='{name}'. Use find_game_objects to locate the correct name." );
 
 		try
 		{
@@ -490,7 +493,9 @@ internal static class SceneDataToolHandlers
 			// batch_set_network_mode params
 			props["networkMode"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Network mode: Never, Object, or Snapshot." };
 
-			// get_serialized params (uses id/name + includeChildren from above)
+			// get_serialized params
+			props["id"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "GUID of object for get_serialized." };
+			props["name"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Name of object for get_serialized." };
 
 			var schema = new Dictionary<string, object> { ["type"] = "object", ["properties"] = props };
 			schema["required"] = new[] { "operation" };

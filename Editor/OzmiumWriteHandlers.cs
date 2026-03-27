@@ -575,6 +575,14 @@ internal static class OzmiumWriteHandlers
 			return el.GetDouble();
 		}
 
+		if ( targetType == typeof( Color ) )
+		{
+			var str = el.ValueKind == JsonValueKind.String ? el.GetString() : el.GetRawText();
+			if ( Color.TryParse( str, out var color ) )
+				return color;
+			return null;
+		}
+
 		if ( targetType == typeof( Vector3 ) && el.ValueKind == JsonValueKind.Object )
 		{
 			float vx = 0, vy = 0, vz = 0;

@@ -33,9 +33,8 @@ internal static class GameEntityConfigToolHandlers
 		string name = OzmiumSceneHelpers.Get( args, "name", (string)null );
 
 		var go = OzmiumSceneHelpers.FindGo( scene, id, name );
-		if ( go == null ) return OzmiumSceneHelpers.Txt( "Object not found." );
+		if ( go == null ) return OzmiumSceneHelpers.Txt( $"Object not found: id='{id}' name='{name}'. Use find_game_objects to locate the correct name." );
 
-		// Try to find DarkRP door component — search for any component with "door" in the name
 		var doorComp = go.Components.GetAll().FirstOrDefault( c =>
 			c.GetType().Name.IndexOf( "door", StringComparison.OrdinalIgnoreCase ) >= 0
 			&& c.GetType().Name.IndexOf( "collider", StringComparison.OrdinalIgnoreCase ) < 0 );
@@ -110,7 +109,7 @@ internal static class GameEntityConfigToolHandlers
 		string name = OzmiumSceneHelpers.Get( args, "name", (string)null );
 
 		var go = OzmiumSceneHelpers.FindGo( scene, id, name );
-		if ( go == null ) return OzmiumSceneHelpers.Txt( "Object not found." );
+		if ( go == null ) return OzmiumSceneHelpers.Txt( $"Object not found: id='{id}' name='{name}'. Use find_game_objects to locate the correct name." );
 
 		try
 		{
@@ -151,7 +150,7 @@ internal static class GameEntityConfigToolHandlers
 		string name = OzmiumSceneHelpers.Get( args, "name", (string)null );
 
 		var go = OzmiumSceneHelpers.FindGo( scene, id, name );
-		if ( go == null ) return OzmiumSceneHelpers.Txt( "Object not found." );
+		if ( go == null ) return OzmiumSceneHelpers.Txt( $"Object not found: id='{id}' name='{name}'. Use find_game_objects to locate the correct name." );
 
 		// Find TriggerHurt or similar trigger component
 		var trigger = go.Components.GetAll().FirstOrDefault( c =>
@@ -200,7 +199,7 @@ internal static class GameEntityConfigToolHandlers
 		string name = OzmiumSceneHelpers.Get( args, "name", (string)null );
 
 		var go = OzmiumSceneHelpers.FindGo( scene, id, name );
-		if ( go == null ) return OzmiumSceneHelpers.Txt( "Object not found." );
+		if ( go == null ) return OzmiumSceneHelpers.Txt( $"Object not found: id='{id}' name='{name}'. Use find_game_objects to locate the correct name." );
 
 		// Find Prop component
 		var prop = go.Components.GetAll().FirstOrDefault( c =>
@@ -245,7 +244,7 @@ internal static class GameEntityConfigToolHandlers
 		string name = OzmiumSceneHelpers.Get( args, "name", (string)null );
 
 		var go = OzmiumSceneHelpers.FindGo( scene, id, name );
-		if ( go == null ) return OzmiumSceneHelpers.Txt( "Object not found." );
+		if ( go == null ) return OzmiumSceneHelpers.Txt( $"Object not found: id='{id}' name='{name}'. Use find_game_objects to locate the correct name." );
 
 		var panel = go.Components.GetAll().FirstOrDefault( c =>
 			c.GetType().Name.IndexOf( "WorldPanel", StringComparison.OrdinalIgnoreCase ) >= 0
@@ -290,7 +289,7 @@ internal static class GameEntityConfigToolHandlers
 		string name = OzmiumSceneHelpers.Get( args, "name", (string)null );
 
 		var go = OzmiumSceneHelpers.FindGo( scene, id, name );
-		if ( go == null ) return OzmiumSceneHelpers.Txt( "Object not found." );
+		if ( go == null ) return OzmiumSceneHelpers.Txt( $"Object not found: id='{id}' name='{name}'. Use find_game_objects to locate the correct name." );
 
 		var chair = go.Components.GetAll().FirstOrDefault( c =>
 			c.GetType().Name.IndexOf( "BaseChair", StringComparison.OrdinalIgnoreCase ) >= 0
@@ -334,7 +333,7 @@ internal static class GameEntityConfigToolHandlers
 		string name = OzmiumSceneHelpers.Get( args, "name", (string)null );
 
 		var go = OzmiumSceneHelpers.FindGo( scene, id, name );
-		if ( go == null ) return OzmiumSceneHelpers.Txt( "Object not found." );
+		if ( go == null ) return OzmiumSceneHelpers.Txt( $"Object not found: id='{id}' name='{name}'. Use find_game_objects to locate the correct name." );
 
 		var dresser = go.Components.GetAll().FirstOrDefault( c =>
 			c.GetType().Name.IndexOf( "Dresser", StringComparison.OrdinalIgnoreCase ) >= 0 );
