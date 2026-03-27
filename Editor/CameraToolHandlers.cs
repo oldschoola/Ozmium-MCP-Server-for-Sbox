@@ -146,4 +146,41 @@ internal static class CameraToolHandlers
 			["backgroundColor"]   = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Background color hex." },
 			["priority"]         = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Camera priority (higher renders on top)." }
 		} );
+
+	// ── manage_camera (Omnibus) ───────────────────────────────────────────
+
+	internal static object ManageCamera( JsonElement args )
+	{
+		string operation = OzmiumSceneHelpers.Get( args, "operation", "" );
+		return operation switch
+		{
+			"create_camera"    => CreateCamera( args ),
+			"configure_camera" => ConfigureCamera( args ),
+			_ => OzmiumSceneHelpers.Txt( $"Unknown operation: {operation}. Use: create_camera, configure_camera" )
+		};
+	}
+
+	internal static Dictionary<string, object> SchemaManageCamera => S( "manage_camera",
+		"Manage cameras: create and configure CameraComponents.",
+		new Dictionary<string, object>
+		{
+			["operation"]          = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Operation to perform.", ["enum"] = new[] { "create_camera", "configure_camera" } },
+			["id"]                 = new Dictionary<string, object> { ["type"] = "string", ["description"] = "GUID (for configure)." },
+			["name"]               = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Name for the GO." },
+			["x"]                  = new Dictionary<string, object> { ["type"] = "number", ["description"] = "World X position." },
+			["y"]                  = new Dictionary<string, object> { ["type"] = "number", ["description"] = "World Y position." },
+			["z"]                  = new Dictionary<string, object> { ["type"] = "number", ["description"] = "World Z position." },
+			["pitch"]              = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Pitch rotation in degrees." },
+			["yaw"]                = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Yaw rotation in degrees." },
+			["roll"]               = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Roll rotation in degrees." },
+			["fov"]                = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Field of view." },
+			["zNear"]              = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Near clip plane." },
+			["zFar"]               = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Far clip plane." },
+			["isMainCamera"]        = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Main camera flag." },
+			["orthographic"]       = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Orthographic projection." },
+			["orthographicHeight"] = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Orthographic height." },
+			["backgroundColor"]    = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Background color hex." },
+			["priority"]           = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Camera priority." }
+		},
+		new[] { "operation" } );
 }

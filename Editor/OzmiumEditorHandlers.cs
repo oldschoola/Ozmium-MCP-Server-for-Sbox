@@ -532,5 +532,53 @@ internal static class OzmiumEditorHandlers
 			["id"]   = new Dictionary<string, object> { ["type"] = "string", ["description"] = "GUID." },
 			["name"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Exact name." }
 		} );
-}
 
+	// ── manage_selection (Omnibus) ────────────────────────────────────────
+
+	internal static object ManageSelection( JsonElement args )
+	{
+		string operation = OzmiumSceneHelpers.Get( args, "operation", "" );
+		return operation switch
+		{
+			"select"        => SelectGameObject( args ),
+			"select_many"   => SetSelectedObjects( args ),
+			"clear"         => ClearSelection(),
+			"get_selected"  => GetSelectedObjects(),
+			_ => OzmiumSceneHelpers.Txt( $"Unknown operation: {operation}. Use: select, select_many, clear, get_selected" )
+		};
+	}
+
+	internal static Dictionary<string, object> SchemaManageSelection => OzmiumSceneHelpers.S( "manage_selection",
+		"Manage editor selection: select objects, select many, clear selection, or get current selection.",
+		new Dictionary<string, object>
+	{
+		["operation"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Operation to perform.", ["enum"] = new[] { "select", "select_many", "clear", "get_selected" } },
+		["id"]        = new Dictionary<string, object> { ["type"] = "string", ["description"] = "GUID (for select operation)." },
+		["name"]      = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Name (for select operation)." },
+		["ids"]       = new Dictionary<string, object> { ["type"] = "array", ["description"] = "Array of GUIDs (for select_many).", ["items"] = new Dictionary<string, object> { ["type"] = "string" } }
+	},
+	new[] { "operation" } );
+
+	// ── manage_editor_state (Omnibus) ────────────────────────────────────
+
+	internal static object ManageEditorState( JsonElement args )
+	{
+		string operation = OzmiumSceneHelpers.Get( args, "operation", "" );
+		return operation switch
+		{
+			"start_play" => StartPlayMode(),
+			"stop_play"  => StopPlayMode(),
+			"get_play_state" => GetPlayState(),
+			"save_scene" => OzmiumWriteHandlers.SaveScene(),
+			_ => OzmiumSceneHelpers.Txt( $"Unknown operation: {operation}. Use: start_play, stop_play, get_play_state, save_scene" )
+		};
+	}
+
+	internal static Dictionary<string, object> SchemaManageEditorState => OzmiumSceneHelpers.S( "manage_editor_state",
+		"Manage editor state: start/stop play mode, get play state, save scene.",
+		new Dictionary<string, object>
+	{
+		["operation"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Operation to perform.", ["enum"] = new[] { "start_play", "stop_play", "get_play_state", "save_scene" } }
+	},
+	new[] { "operation" } );
+}

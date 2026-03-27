@@ -638,4 +638,87 @@ internal static class EffectToolHandlers
 			["occlusion"]         = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Block damage through walls (default true)." },
 			["damageTags"]        = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Comma-separated damage tags." }
 		} );
+
+	// ── manage_effects (Omnibus) ──────────────────────────────────────────
+
+	internal static object ManageEffects( JsonElement args )
+	{
+		string operation = OzmiumSceneHelpers.Get( args, "operation", "" );
+		return operation switch
+		{
+			"create_particle_effect"    => CreateParticleEffect( args ),
+			"configure_particle_effect" => ConfigureParticleEffect( args ),
+			"create_fog_volume"         => CreateFogVolume( args ),
+			"configure_post_processing" => ConfigurePostProcessing( args ),
+			"create_environment_light"  => CreateEnvironmentLight( args ),
+			"create_beam_effect"        => CreateBeamEffect( args ),
+			"create_verlet_rope"        => CreateVerletRope( args ),
+			"create_joint"              => CreateJoint( args ),
+			"create_clutter"            => CreateClutter( args ),
+			"create_radius_damage"      => CreateRadiusDamage( args ),
+			_ => OzmiumSceneHelpers.Txt( $"Unknown operation: {operation}. Use: create_particle_effect, configure_particle_effect, create_fog_volume, configure_post_processing, create_environment_light, create_beam_effect, create_verlet_rope, create_joint, create_clutter, create_radius_damage" )
+		};
+	}
+
+	internal static Dictionary<string, object> SchemaManageEffects => S( "manage_effects",
+		"Manage effects & environment: particles, fog, post-processing, environment light, beams, ropes, joints, clutter, radius damage.",
+		new Dictionary<string, object>
+		{
+			["operation"]          = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Operation to perform.", ["enum"] = new[] { "create_particle_effect", "configure_particle_effect", "create_fog_volume", "configure_post_processing", "create_environment_light", "create_beam_effect", "create_verlet_rope", "create_joint", "create_clutter", "create_radius_damage" } },
+			["id"]                 = new Dictionary<string, object> { ["type"] = "string", ["description"] = "GUID (for configure operations)." },
+			["name"]               = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Name for the GO." },
+			["x"]                  = new Dictionary<string, object> { ["type"] = "number", ["description"] = "World X position." },
+			["y"]                  = new Dictionary<string, object> { ["type"] = "number", ["description"] = "World Y position." },
+			["z"]                  = new Dictionary<string, object> { ["type"] = "number", ["description"] = "World Z position." },
+			["maxParticles"]       = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Max particles." },
+			["lifetime"]           = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Lifetime in seconds." },
+			["timeScale"]          = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Time scale." },
+			["preWarm"]            = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Pre-warm seconds." },
+			["fogType"]            = FogTypes,
+			["color"]              = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Color hex." },
+			["strength"]           = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Fog/strength value." },
+			["height"]             = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Fog height." },
+			["startDistance"]      = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Start distance." },
+			["endDistance"]        = new Dictionary<string, object> { ["type"] = "number", ["description"] = "End distance." },
+			["falloffExponent"]    = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Falloff exponent." },
+			["verticalFalloffExponent"] = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Vertical falloff exponent." },
+			["priority"]           = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Volume priority." },
+			["blendWeight"]        = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Blend weight (0-1)." },
+			["blendDistance"]      = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Blend distance." },
+			["editorPreview"]      = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Show preview when selected." },
+			["sunDirection"]       = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Sun direction as 'pitch yaw roll'." },
+			["sunColor"]           = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Sun color hex." },
+			["ambientColor"]       = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Ambient color hex." },
+			["skyMaterial"]        = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Sky material path." },
+			["scale"]              = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Scale." },
+			["targetPosition"]     = new Dictionary<string, object> { ["type"] = "object", ["description"] = "Target position {x,y,z}." },
+			["targetId"]           = new Dictionary<string, object> { ["type"] = "string", ["description"] = "GUID of target GO." },
+			["targetName"]         = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Name of target GO." },
+			["beamsPerSecond"]     = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Beams per second." },
+			["maxBeams"]           = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Max simultaneous beams." },
+			["looped"]             = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Loop the beam/effect." },
+			["attachmentId"]       = new Dictionary<string, object> { ["type"] = "string", ["description"] = "GUID of attachment GO." },
+			["attachmentName"]     = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Name of attachment GO." },
+			["segmentCount"]       = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Rope segment count." },
+			["slack"]              = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Rope slack." },
+			["radius"]             = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Radius." },
+			["stiffness"]          = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Rope stiffness (0-1)." },
+			["dampingFactor"]      = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Rope damping (0-1)." },
+			["type"]               = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Joint type.", ["enum"] = new[] { "Fixed", "Ball", "Hinge", "Slider", "Spring", "Wheel" } },
+			["bodyId"]             = new Dictionary<string, object> { ["type"] = "string", ["description"] = "GUID of body GO." },
+			["bodyName"]           = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Name of body GO." },
+			["anchorBodyId"]       = new Dictionary<string, object> { ["type"] = "string", ["description"] = "GUID of anchor GO." },
+			["anchorBodyName"]     = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Name of anchor GO." },
+			["strength"]           = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Linear strength." },
+			["angularStrength"]    = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Angular strength." },
+			["clutterDefinitionPath"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "ClutterDefinition asset path." },
+			["seed"]               = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Random seed." },
+			["mode"]               = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Mode (Clutter: Volume/Infinite)." },
+			["damageAmount"]       = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Damage amount." },
+			["physicsForceScale"]  = new Dictionary<string, object> { ["type"] = "number", ["description"] = "Physics force scale." },
+			["damageOnEnabled"]    = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Apply damage on enable." },
+			["occlusion"]          = new Dictionary<string, object> { ["type"] = "boolean", ["description"] = "Block damage through walls." },
+			["damageTags"]         = new Dictionary<string, object> { ["type"] = "string", ["description"] = "Comma-separated damage tags." }
+		},
+		new[] { "operation" } );
 }

@@ -7,7 +7,7 @@ Connect AI coding assistants to the S&box editor using the [Model Context Protoc
 ## Features
 
 - SSE-based MCP server running on `localhost:8098`
-- **95 tools** across twelve categories: scene read, scene write, asset queries, editor control, console access, mesh editing, lighting, physics, audio, camera, effects & environment, and utilities
+- **59 tools** across twelve categories: scene read, scene write, asset queries, editor control, console access, mesh editing, lighting, physics, audio, camera, effects & environment, and utilities
 - Disabled objects and disabled subtrees are fully visible to all query tools
 - Built-in Editor panel with live server status, session count, and an activity log
 - Localhost-only — nothing leaves your machine
@@ -93,9 +93,6 @@ Toggle a component's enabled state. Requires `componentType`, `enabled`, and `id
 #### `instantiate_prefab`
 Spawn a prefab at a world position. Accepts `path` (prefab asset path), `x/y/z`, and optional `parentId`. Use `browse_assets` with `type="prefab"` to find valid paths first.
 
-#### `save_scene`
-Save the currently open scene or prefab to disk.
-
 #### `undo`
 Undo the last editor operation.
 
@@ -137,32 +134,40 @@ Enhanced scene summary with component type frequency, prefab breakdown, network 
 
 ### Editor Control
 
-#### `select_game_object`
-Select a GameObject in the editor hierarchy and viewport by `id` or `name`.
+#### `manage_selection`
+Omnibus tool for editor selection. Operations:
+- `"select"` — Select a GameObject by `id` or `name`
+- `"select_many"` — Select multiple objects via `ids` array
+- `"clear"` — Clear the editor selection
+- `"get_selected"` — Return the currently selected objects
+
+#### `manage_editor_state`
+Omnibus tool for editor state control. Operations:
+- `"start_play"` — Press the Play button
+- `"stop_play"` — Press the Stop button
+- `"get_play_state"` — Returns `"Playing"` or `"Stopped"`
+- `"save_scene"` — Save the currently open scene or prefab to disk
 
 #### `open_asset`
 Open an asset in its default editor (scene, prefab, material, etc.). Requires `path`.
 
-#### `get_play_state`
-Returns the current play state: `"Playing"` or `"Stopped"`.
-
-#### `start_play_mode`
-Press the Play button in the editor.
-
-#### `stop_play_mode`
-Press the Stop button in the editor.
-
 #### `get_editor_log`
 Return recent log lines captured from the editor output. Accepts `lines` (default 50).
 
-#### `get_selected_objects`
-Return the currently selected objects in the editor.
+#### `frame_selection`
+Focus the editor camera on the current selection or specified objects. Accepts optional `ids` array.
 
-#### `set_selected_objects`
-Select multiple objects at once. Requires `ids` (array of GUIDs).
+#### `save_scene_as`
+Save the current scene to a new file path. Accepts `path`.
 
-#### `clear_selection`
-Clear the editor selection.
+#### `get_scene_unsaved`
+Check if the current scene has unsaved changes.
+
+#### `break_from_prefab`
+Break a prefab instance's connection to its source prefab. Requires `id` or `name`.
+
+#### `update_from_prefab`
+Update a prefab instance to match its source prefab. Requires `id` or `name`.
 
 ---
 
@@ -181,20 +186,13 @@ Get or set a console variable. Pass just the name to read its current value; pas
 #### `create_block`
 Creates a primitive block mesh using `PolygonMesh`. Compatible with S&box mesh editing tools. Accepts `x/y/z` (position), `sizeX/Y/Z`, `name`, and `materialPath`.
 
-#### `set_face_material`
-Applies a material to a specific face or all faces of a mesh. Requires `materialPath`, optional `faceIndex` (-1 for all faces) and `gameObjectId`/`name`.
-
-#### `set_texture_parameters`
-Sets texture mapping parameters (UV axes and scale) for faces. Accepts `uAxisX/Y/Z`, `vAxisX/Y/Z`, `scaleU`, `scaleV`, and `faceIndex`.
-
-#### `set_vertex_position`
-Sets the position of a vertex by index for displacement/sculpting. Requires `vertexIndex`, `x/y/z`, and `gameObjectId`/`name`.
-
-#### `set_vertex_color`
-Sets the vertex color for vertex painting. Requires `vertexIndex`, `r/g/b/a` (0-1), and `gameObjectId`/`name`.
-
-#### `set_vertex_blend`
-Sets the vertex blend weights for terrain/texturing. Requires `vertexIndex`, `r/g/b/blend` (0-1), and `gameObjectId`/`name`.
+#### `edit_mesh`
+Omnibus tool for mesh editing. Operations:
+- `"set_face_material"` — Apply a material to a face or all faces
+- `"set_texture_parameters"` — Set UV axes and scale for faces
+- `"set_vertex_position"` — Displace a vertex by index
+- `"set_vertex_color"` — Set vertex color for painting
+- `"set_vertex_blend"` — Set vertex blend weights for terrain
 
 #### `get_mesh_info`
 Queries detailed information about a mesh including vertex/face counts, bounds, and per-face materials. Requires `gameObjectId` or `name`.
@@ -203,72 +201,67 @@ Queries detailed information about a mesh including vertex/face counts, bounds, 
 
 ### Lighting
 
-#### `create_light`
-Creates a GO with a light component (`PointLight`, `SpotLight`, or `DirectionalLight`). Accepts `type`, `x/y/z`, `color`, `shadows`, `radius`, `attenuation`, `coneOuter`, `coneInner`, and `name`.
-
-#### `configure_light`
-Sets properties on an existing Light component. Supports `color`, `shadows`, `radius`, `attenuation`, `coneOuter`, `coneInner`, `fogMode`, `fogStrength`, and `skyIndirectLighting`.
-
-#### `create_sky_box`
-Creates a GO with a `SkyBox2D` component for sky rendering. Accepts `skyMaterial` path, `tint` color, and `skyIndirectLighting` toggle.
-
-#### `set_sky_box`
-Configures an existing `SkyBox2D` component. Supports `skyMaterial`, `tint`, and `skyIndirectLighting`.
-
-#### `create_ambient_light`
-Creates a scene-level `AmbientLight` for global ambient illumination. Accepts `color`, `x/y/z`, and `name`.
+#### `manage_lighting`
+Omnibus tool for lighting. Operations:
+- `"create_light"` — Create a GO with a light component (PointLight/SpotLight/DirectionalLight)
+- `"configure_light"` — Set properties on an existing Light component
+- `"create_sky_box"` — Create a GO with a SkyBox2D component
+- `"set_sky_box"` — Configure an existing SkyBox2D component
+- `"create_ambient_light"` — Create an AmbientLight for global ambient illumination
+- `"create_indirect_light_volume"` — Create an IndirectLightVolume (DDGI) for dynamic GI
 
 ---
 
 ### Physics
 
-#### `add_collider`
-Adds a collider component (`BoxCollider`, `SphereCollider`, `CapsuleCollider`, or `ModelCollider`) to a GameObject with configured properties including `center`, `size`/`radius`, `friction`, `elasticity`, `isTrigger`, and `surfaceVelocity`.
-
-#### `configure_collider`
-Modifies properties on an existing Collider component. Supports all the same properties as `add_collider`.
-
-#### `add_rigidbody`
-Adds a `Rigidbody` component to a GameObject for physics simulation. Accepts `mass`, `gravity`, `gravityScale`, `linearDamping`, and `angularDamping`.
+#### `manage_physics`
+Omnibus tool for physics. Operations:
+- `"add_collider"` — Add a collider (Box/Sphere/Capsule/ModelCollider) with configured properties
+- `"configure_collider"` — Modify properties on an existing Collider component
+- `"add_rigidbody"` — Add a Rigidbody for physics simulation
+- `"create_character_controller"` — Create a CharacterController for collision-based movement
+- `"add_plane_collider"` — Add a PlaneCollider for flat surfaces
+- `"add_hull_collider"` — Add a HullCollider (Box/Cone/Cylinder primitives)
+- `"create_model_physics"` — Create a ModelPhysics for ragdolls and per-bone physics
 
 ---
 
 ### Audio
 
-#### `create_sound_point`
-Creates a GO with a `SoundPointComponent` for spatial audio. Accepts `x/y/z`, `name`, `soundEvent` path, `volume`, `pitch`, `playOnStart`, and `repeat`.
-
-#### `configure_sound`
-Configures an existing `BaseSoundComponent` on a GameObject. Supports `soundEvent`, `volume`, `pitch`, `playOnStart`, `repeat`, `distanceAttenuation`, and `distance`.
+#### `manage_audio`
+Omnibus tool for audio. Operations:
+- `"create_sound_point"` — Create a spatial audio SoundPointComponent
+- `"configure_sound"` — Configure an existing BaseSoundComponent
+- `"create_soundscape_trigger"` — Create a SoundscapeTrigger for ambient audio zones
+- `"create_sound_box"` — Create a SoundBoxComponent for area ambient sounds
+- `"create_dsp_volume"` — Create a DspVolume for audio effect zones
+- `"create_audio_listener"` — Create an AudioListener for custom audio origins
 
 ---
 
 ### Camera
 
-#### `create_camera`
-Creates a GO with a `CameraComponent`. Accepts `x/y/z`, `pitch/yaw/roll`, `name`, `fov`, `zNear`, `zFar`, `isMainCamera`, `orthographic`, and `orthographicHeight`.
-
-#### `configure_camera`
-Configures an existing `CameraComponent`. Supports `fov`, `zNear`, `zFar`, `isMainCamera`, `orthographic`, `orthographicHeight`, `backgroundColor`, and `priority`.
+#### `manage_camera`
+Omnibus tool for cameras. Operations:
+- `"create_camera"` — Create a GO with a CameraComponent
+- `"configure_camera"` — Configure an existing CameraComponent
 
 ---
 
 ### Effects & Environment
 
-#### `create_particle_effect`
-Creates a GO with a `ParticleEffect` component. Accepts `x/y/z`, `name`, `maxParticles`, `lifetime`, `timeScale`, and `preWarm`.
-
-#### `configure_particle_effect`
-Sets properties on an existing `ParticleEffect`. Supports `maxParticles`, `lifetime`, `timeScale`, and `preWarm`.
-
-#### `create_fog_volume`
-Creates a GO with a fog volume component (`GradientFog` or `VolumetricFogVolume`). Accepts `fogType`, `color`, `height`, `startDistance`, `endDistance`, `falloffExponent`, and `strength`.
-
-#### `configure_post_processing`
-Creates a `PostProcessVolume` on an existing or new GO for post-processing effects. Accepts `priority`, `blendWeight`, `blendDistance`, and `editorPreview`.
-
-#### `create_environment_light`
-Creates a complete environment lighting setup in one call: `DirectionalLight` (sun) + `AmbientLight` + `SkyBox2D`. Accepts `sunDirection` (pitch yaw roll), `sunColor`, `ambientColor`, and `skyMaterial`.
+#### `manage_effects`
+Omnibus tool for effects and environment. Operations:
+- `"create_particle_effect"` — Create a ParticleEffect component
+- `"configure_particle_effect"` — Configure an existing ParticleEffect
+- `"create_fog_volume"` — Create a fog volume (GradientFog or VolumetricFogVolume)
+- `"configure_post_processing"` — Create a PostProcessVolume for post-processing effects
+- `"create_environment_light"` — Create a complete environment (sun + ambient + sky)
+- `"create_beam_effect"` — Create a BeamEffect for laser/energy effects
+- `"create_verlet_rope"` — Create a VerletRope for rope physics
+- `"create_joint"` — Create a physics joint (Fixed/Ball/Hinge/Slider/Spring/Wheel)
+- `"create_clutter"` — Create a ClutterComponent for vegetation/object scattering
+- `"create_radius_damage"` — Create a RadiusDamage for explosion/area damage
 
 ---
 
@@ -336,7 +329,7 @@ git submodule update --remote Libraries/ozmium.oz_mcp
 }
 ```
 
-5. **Done.** Your AI assistant can now call all 95 tools directly.
+5. **Done.** Your AI assistant can now call all 59 tools directly.
 
 ---
 
@@ -357,14 +350,17 @@ git submodule update --remote Libraries/ozmium.oz_mcp
 | `OzmiumReadHandlers.cs` | Tool logic for all scene-read tools |
 | `OzmiumWriteHandlers.cs` | Tool logic for all scene-write tools (create, add/remove component, set property, destroy, reparent, tags, instantiate, save, undo/redo) — also owns write tool schemas |
 | `OzmiumAssetHandlers.cs` | Tool logic for asset-query tools (browse, model info, material, prefab structure, reload) — also owns asset tool schemas |
-| `OzmiumEditorHandlers.cs` | Tool logic for editor-control tools (select, open asset, play state, play/stop, editor log, console commands) — also owns editor tool schemas |
-| `MeshEditHandlers.cs` | Mesh editing tools (create block, face materials, texture params, vertex position/color/blend, mesh info) |
-| `LightingToolHandlers.cs` | Lighting tools (create/configure light, sky box, ambient light) |
-| `PhysicsToolHandlers.cs` | Physics tools (add/configure collider, add rigidbody) |
-| `AudioToolHandlers.cs` | Audio tools (create/configure sound point) |
-| `CameraToolHandlers.cs` | Camera tools (create/configure camera) |
-| `EffectToolHandlers.cs` | Effect & environment tools (particle effects, fog volumes, post-processing, environment light) |
+| `OzmiumEditorHandlers.cs` | Tool logic for editor-control tools (selection, editor state, open asset, editor log) — also owns editor tool schemas |
+| `MeshEditHandlers.cs` | Mesh editing tools (create block, edit_mesh omnibus, mesh info) |
+| `LightingToolHandlers.cs` | Lighting omnibus tool (manage_lighting) |
+| `PhysicsToolHandlers.cs` | Physics omnibus tool (manage_physics) |
+| `AudioToolHandlers.cs` | Audio omnibus tool (manage_audio) |
+| `CameraToolHandlers.cs` | Camera omnibus tool (manage_camera) |
+| `EffectToolHandlers.cs` | Effects & environment omnibus tool (manage_effects) |
 | `UtilityToolHandlers.cs` | Utility tools (asset dependencies, batch transform, copy component, object bounds) |
+| `NavigationToolHandlers.cs` | Navigation tools (nav mesh agent, link, area) |
+| `RenderingToolHandlers.cs` | Rendering omnibus tool (create_render_entity) |
+| `GameToolHandlers.cs` | Game omnibus tool (create_game_entity) |
 | `AssetToolHandlers.cs` | Legacy asset handler (superseded by `OzmiumAssetHandlers`) |
 | `ConsoleToolHandlers.cs` | Tool logic for `list_console_commands` and `run_console_command` |
 | `ToolHandlerBase.cs` | Shared handler utilities (`TextResult`, `AppendHierarchyLine`) |
