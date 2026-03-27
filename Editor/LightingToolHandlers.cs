@@ -13,11 +13,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class LightingToolHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-	};
 
 	// ── create_light ──────────────────────────────────────────────────────
 
@@ -105,7 +100,7 @@ internal static class LightingToolHandlers
 				message = $"Created {type} '{go.Name}'.",
 				id       = go.Id.ToString(),
 				position = OzmiumSceneHelpers.V3( go.WorldPosition )
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -228,7 +223,7 @@ internal static class LightingToolHandlers
 				message = $"Created SkyBox '{go.Name}'.",
 				id       = go.Id.ToString(),
 				position = OzmiumSceneHelpers.V3( go.WorldPosition )
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -299,7 +294,7 @@ internal static class LightingToolHandlers
 				message = $"Created AmbientLight '{go.Name}'.",
 				id       = go.Id.ToString(),
 				position = OzmiumSceneHelpers.V3( go.WorldPosition )
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -454,7 +449,7 @@ internal static class LightingToolHandlers
 				id       = go.Id.ToString(),
 				position = OzmiumSceneHelpers.V3( go.WorldPosition ),
 				probeDensity = ilg.ProbeDensity
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}

@@ -14,11 +14,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class EffectToolHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-	};
 
 	// ── create_particle_effect ──────────────────────────────────────────────
 
@@ -49,7 +44,7 @@ internal static class EffectToolHandlers
 				message = $"Created ParticleEffect '{go.Name}'.",
 				id       = go.Id.ToString(),
 				position = OzmiumSceneHelpers.V3( go.WorldPosition )
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -132,7 +127,7 @@ internal static class EffectToolHandlers
 				message  = $"Created {fogType} fog on '{go.Name}'.",
 				id       = go.Id.ToString(),
 				position = OzmiumSceneHelpers.V3( go.WorldPosition )
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -214,7 +209,7 @@ internal static class EffectToolHandlers
 				sun      = new { id = sun.Id.ToString(), position = OzmiumSceneHelpers.V3( sun.WorldPosition ), rotation = OzmiumSceneHelpers.Rot( sun.WorldRotation ) },
 				ambient  = new { id = amb.Id.ToString(), position = OzmiumSceneHelpers.V3( amb.WorldPosition ) },
 				skybox   = new { id = sky.Id.ToString(), position = OzmiumSceneHelpers.V3( sky.WorldPosition ), material = skyMat }
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -337,7 +332,7 @@ internal static class EffectToolHandlers
 				message = $"Created BeamEffect '{go.Name}'.",
 				id       = go.Id.ToString(),
 				position = OzmiumSceneHelpers.V3( go.WorldPosition )
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -381,7 +376,7 @@ internal static class EffectToolHandlers
 				message = $"Created VerletRope '{go.Name}'.",
 				id       = go.Id.ToString(),
 				position = OzmiumSceneHelpers.V3( go.WorldPosition )
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -441,7 +436,7 @@ internal static class EffectToolHandlers
 				id       = go.Id.ToString(),
 				position = OzmiumSceneHelpers.V3( go.WorldPosition ),
 				type     = jointType
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -554,7 +549,7 @@ internal static class EffectToolHandlers
 				id       = go.Id.ToString(),
 				position = OzmiumSceneHelpers.V3( go.WorldPosition ),
 				mode     = clutter.Mode.ToString()
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -599,7 +594,7 @@ internal static class EffectToolHandlers
 				position = OzmiumSceneHelpers.V3( go.WorldPosition ),
 				radius   = rd.Radius,
 				damage   = rd.DamageAmount
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}

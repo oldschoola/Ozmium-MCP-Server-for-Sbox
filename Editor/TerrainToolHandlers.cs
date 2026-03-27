@@ -13,11 +13,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class TerrainToolHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-	};
 
 	// 4-connectivity neighbor offsets for BFS / erosion
 	private static readonly int[] N4Dx = { -1, 1, 0, 0 };
@@ -63,7 +58,7 @@ internal static class TerrainToolHandlers
 				resolution,
 				terrainSize,
 				terrainHeight
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception e ) { return OzmiumSceneHelpers.Txt( $"Error: {e.Message}" ); }
 	}
@@ -174,7 +169,7 @@ internal static class TerrainToolHandlers
 			terrainHeight = s.TerrainHeight,
 			materialCount = s.Materials.Count,
 			materials
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── get_height ──────────────────────────────────────────────────────────
@@ -220,7 +215,7 @@ internal static class TerrainToolHandlers
 			rawHeight,
 			worldHeight = MathF.Round( heightWorldPos.y, 2 ),
 			worldPosition = new { x = MathF.Round( heightWorldPos.x, 2 ), y = MathF.Round( heightWorldPos.y, 2 ), z = MathF.Round( heightWorldPos.z, 2 ) }
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── set_height / flatten helpers ────────────────────────────────────────
@@ -429,7 +424,7 @@ internal static class TerrainToolHandlers
 			baseMaterial      = info.Value.BaseMaterial?.ResourceName,
 			overlayMaterial   = info.Value.OverlayMaterial?.ResourceName,
 			dominantMaterial  = info.Value.GetDominantMaterial()?.ResourceName
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── get_normal ──────────────────────────────────────────────────────────
@@ -465,7 +460,7 @@ internal static class TerrainToolHandlers
 			slopeAngleDegrees = MathF.Round( slopeDeg, 2 ),
 			compassDirection = compass,
 			suitableForBuilding = slopeDeg <= maxSlope
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── sample_heights ──────────────────────────────────────────────────────
@@ -512,7 +507,7 @@ internal static class TerrainToolHandlers
 			message = $"Sampled {results.Count} points.",
 			count = results.Count,
 			heights = results
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── get_height_profile ──────────────────────────────────────────────────
@@ -569,7 +564,7 @@ internal static class TerrainToolHandlers
 				? new { min = MathF.Round( minH, 2 ), max = MathF.Round( maxH, 2 ) }
 				: null,
 			points
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── find_flat_areas ─────────────────────────────────────────────────────
@@ -712,7 +707,7 @@ internal static class TerrainToolHandlers
 			minSize,
 			areasFound = results.Count,
 			areas = results
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── get_terrain_statistics ──────────────────────────────────────────────
@@ -775,7 +770,7 @@ internal static class TerrainToolHandlers
 			maxSlopeDegrees = MathF.Round( maxSlope, 2 ),
 			texelCount = total,
 			texelSize = MathF.Round( texelSize, 2 )
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── smooth ──────────────────────────────────────────────────────────────

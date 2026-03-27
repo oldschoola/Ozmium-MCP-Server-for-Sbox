@@ -14,11 +14,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class SceneDataToolHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-	};
 
 	private static readonly JsonSerializerOptions _pretty = new()
 	{
@@ -79,7 +74,7 @@ internal static class SceneDataToolHandlers
 				count = serialized.Count,
 				includeChildren,
 				objects = serialized
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -150,7 +145,7 @@ internal static class SceneDataToolHandlers
 				message = $"Deserialized {created.Count} object(s) into scene.",
 				count = created.Count,
 				created
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -266,7 +261,7 @@ internal static class SceneDataToolHandlers
 			};
 			if ( errors.Count > 0 ) result["errors"] = errors;
 
-			return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( result, _json ) );
+			return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( result, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -343,8 +338,8 @@ internal static class SceneDataToolHandlers
 		{
 			try
 			{
-				var jsonA = JsonSerializer.Serialize( goA.Serialize(), _json );
-				var jsonB = JsonSerializer.Serialize( goB.Serialize(), _json );
+				var jsonA = JsonSerializer.Serialize( goA.Serialize(), OzmiumSceneHelpers.JsonSettings );
+				var jsonB = JsonSerializer.Serialize( goB.Serialize(), OzmiumSceneHelpers.JsonSettings );
 				if ( jsonA != jsonB )
 					diffs.Add( new Dictionary<string, object>
 					{
@@ -365,7 +360,7 @@ internal static class SceneDataToolHandlers
 			objectA = new { id = goA.Id.ToString(), name = goA.Name },
 			objectB = new { id = goB.Id.ToString(), name = goB.Name },
 			differences = diffs
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── batch_set_network_mode ─────────────────────────────────────────────
@@ -430,7 +425,7 @@ internal static class SceneDataToolHandlers
 				id = go.Id.ToString(),
 				name = go.Name,
 				serialized
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}

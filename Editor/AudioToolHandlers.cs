@@ -13,11 +13,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class AudioToolHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-	};
 	// ── create_sound_point ───────────────────────────────────────────────────
 
 	internal static object CreateSoundPoint( JsonElement args )
@@ -61,7 +56,7 @@ internal static class AudioToolHandlers
 				message = $"Created SoundPoint '{go.Name}'.",
 				id       = go.Id.ToString(),
 				position = OzmiumSceneHelpers.V3( go.WorldPosition )
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -202,7 +197,7 @@ internal static class AudioToolHandlers
 				position = OzmiumSceneHelpers.V3( go.WorldPosition ),
 				type     = st.Type.ToString(),
 				volume   = st.Volume
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -254,7 +249,7 @@ internal static class AudioToolHandlers
 				id       = go.Id.ToString(),
 				position = OzmiumSceneHelpers.V3( go.WorldPosition ),
 				boxSize  = new { sb.Scale.x, sb.Scale.y, sb.Scale.z }
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -319,7 +314,7 @@ internal static class AudioToolHandlers
 				id       = go.Id.ToString(),
 				position = OzmiumSceneHelpers.V3( go.WorldPosition ),
 				volumeType = sv.Type.ToString()
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -407,7 +402,7 @@ internal static class AudioToolHandlers
 				message = $"Created AudioListener '{go.Name}'.",
 				id       = go.Id.ToString(),
 				position = OzmiumSceneHelpers.V3( go.WorldPosition )
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}

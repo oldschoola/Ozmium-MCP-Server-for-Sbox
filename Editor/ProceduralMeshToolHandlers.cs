@@ -14,11 +14,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class ProceduralMeshToolHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-	};
 
 	// ── create_mesh ─────────────────────────────────────────────────────────
 
@@ -94,7 +89,7 @@ internal static class ProceduralMeshToolHandlers
 				vertexCount = positions.Count,
 				faceCount   = hFaces.Count,
 				material    = materialPath
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -336,7 +331,7 @@ internal static class ProceduralMeshToolHandlers
 				position = OzmiumSceneHelpers.V3( go.WorldPosition ),
 				faceCount = hFaces.Count,
 				material = materialPath
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -443,7 +438,7 @@ internal static class ProceduralMeshToolHandlers
 				vertexCount = vertices.Count,
 				faceCount   = hFaces.Count,
 				material    = materialPath
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -594,7 +589,7 @@ internal static class ProceduralMeshToolHandlers
 				vertexCount = vertices.Count,
 				faceCount   = hFaces.Count,
 				material    = materialPath
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}

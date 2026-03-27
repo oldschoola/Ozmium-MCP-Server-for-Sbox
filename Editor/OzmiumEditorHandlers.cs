@@ -14,11 +14,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class OzmiumEditorHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-	};
 
 	// Circular log buffer — editor feeds into this from LogMessage
 	private static readonly System.Collections.Concurrent.ConcurrentQueue<string> _log
@@ -88,7 +83,7 @@ internal static class OzmiumEditorHandlers
 	{
 		var session = SceneEditorSession.Active;
 		var state = session?.IsPlaying == true ? "Playing" : "Stopped";
-		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new { playState = state }, _json ) );
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new { playState = state }, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── start_play_mode ─────────────────────────────────────────────────────
@@ -167,7 +162,7 @@ internal static class OzmiumEditorHandlers
 		entries = entries.GroupBy( e => e["name"]?.ToString() ).Select( g => g.First() )
 			.OrderBy( e => e["name"]?.ToString() ).ToList();
 
-		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new { summary = $"Found {entries.Count} [ConVar] entries{( !string.IsNullOrEmpty( filter ) ? $" matching '{filter}'" : "" )}.", entries, skippedAssemblies = Array.Empty<string>() }, _json ) );
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new { summary = $"Found {entries.Count} [ConVar] entries{( !string.IsNullOrEmpty( filter ) ? $" matching '{filter}'" : "" )}.", entries, skippedAssemblies = Array.Empty<string>() }, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── run_console_command ─────────────────────────────────────────────────
@@ -201,7 +196,7 @@ internal static class OzmiumEditorHandlers
 		var selected = OzmiumSceneHelpers.GetSelectedGameObjects();
 		var results = selected.Select( go => OzmiumSceneHelpers.BuildSummary( go ) ).ToList();
 		var summary = $"{results.Count} object(s) selected.";
-		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new { summary, results }, _json ) );
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new { summary, results }, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── set_selected_objects ──────────────────────────────────────────────
@@ -523,14 +518,14 @@ internal static class OzmiumEditorHandlers
 			{
 				hasUnsavedChanges = false,
 				message = "No editor session active."
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 
 			var hasUnsaved = session.HasUnsavedChanges;
 			return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new
 			{
 				hasUnsavedChanges = hasUnsaved,
 				message = hasUnsaved ? "Scene has unsaved changes." : "Scene is saved."
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -658,7 +653,7 @@ internal static class OzmiumEditorHandlers
 				scenePath = (string)null,
 				sceneName = (string)null,
 				message = "No editor session active."
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 
 			var scene = session.Scene;
 			string resourcePath = scene?.Source?.ResourcePath;
@@ -669,7 +664,7 @@ internal static class OzmiumEditorHandlers
 				scenePath = resourcePath,
 				sceneName = sceneName,
 				isPrefabSession = session.IsPrefabSession
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}

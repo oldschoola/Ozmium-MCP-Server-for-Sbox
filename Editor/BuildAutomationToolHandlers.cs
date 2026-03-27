@@ -13,11 +13,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class BuildAutomationToolHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-	};
 
 	private const int MaxScatterCount = 500;
 
@@ -131,7 +126,7 @@ internal static class BuildAutomationToolHandlers
 				},
 				alignToGround,
 				created
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -220,7 +215,7 @@ internal static class BuildAutomationToolHandlers
 				targetPrefabPath,
 				preserveTransform,
 				replaced
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -276,7 +271,7 @@ internal static class BuildAutomationToolHandlers
 			missed,
 			offsetY,
 			updated
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── randomize_transforms ───────────────────────────────────────────────
@@ -347,7 +342,7 @@ internal static class BuildAutomationToolHandlers
 			message = $"Randomized transforms on {modified} object(s) (found {found} of {ids.Count}).",
 			modified,
 			updated
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── snap_to_grid ───────────────────────────────────────────────────────
@@ -400,7 +395,7 @@ internal static class BuildAutomationToolHandlers
 			snapped,
 			gridSize,
 			updated
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── distribute_along_line ─────────────────────────────────────────────
@@ -501,7 +496,7 @@ internal static class BuildAutomationToolHandlers
 				alignToGround,
 				lookAlongPath,
 				created
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -574,7 +569,7 @@ internal static class BuildAutomationToolHandlers
 			height = targetHeight,
 			useAverage = !explicitHeight.HasValue && useAverage,
 			updated
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── build_automation (Omnibus) ─────────────────────────────────────────

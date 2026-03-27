@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Sandbox;
 
 namespace SboxMcpServer;
@@ -14,11 +13,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class GameEntityConfigToolHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-	};
 
 	private static readonly System.Reflection.BindingFlags PublicSet = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance;
 
@@ -95,7 +89,7 @@ internal static class GameEntityConfigToolHandlers
 		};
 		if ( errors.Count > 0 ) result["errors"] = errors;
 
-		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( result, _json ) );
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( result, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── configure_spawn_point ──────────────────────────────────────────────
@@ -134,7 +128,7 @@ internal static class GameEntityConfigToolHandlers
 				message = $"Configured spawn point '{go.Name}'.",
 				id = go.Id.ToString(),
 				tags = OzmiumSceneHelpers.GetTags( go )
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -185,7 +179,7 @@ internal static class GameEntityConfigToolHandlers
 		};
 		if ( errors.Count > 0 ) result["errors"] = errors;
 
-		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( result, _json ) );
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( result, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── configure_prop ─────────────────────────────────────────────────────
@@ -230,7 +224,7 @@ internal static class GameEntityConfigToolHandlers
 		};
 		if ( errors.Count > 0 ) result["errors"] = errors;
 
-		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( result, _json ) );
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( result, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── configure_world_panel ──────────────────────────────────────────────
@@ -275,7 +269,7 @@ internal static class GameEntityConfigToolHandlers
 		};
 		if ( errors.Count > 0 ) result["errors"] = errors;
 
-		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( result, _json ) );
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( result, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── configure_chair ────────────────────────────────────────────────────
@@ -319,7 +313,7 @@ internal static class GameEntityConfigToolHandlers
 		};
 		if ( errors.Count > 0 ) result["errors"] = errors;
 
-		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( result, _json ) );
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( result, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── configure_dresser ──────────────────────────────────────────────────
@@ -364,7 +358,7 @@ internal static class GameEntityConfigToolHandlers
 		};
 		if ( errors.Count > 0 ) result["errors"] = errors;
 
-		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( result, _json ) );
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( result, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── configure_game_entities (Omnibus) ──────────────────────────────────

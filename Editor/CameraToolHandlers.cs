@@ -12,11 +12,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class CameraToolHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-	};
 
 	// ── create_camera ──────────────────────────────────────────────────────
 
@@ -57,7 +52,7 @@ internal static class CameraToolHandlers
 				id       = go.Id.ToString(),
 				position = OzmiumSceneHelpers.V3( go.WorldPosition ),
 				fov      = cam.FieldOfView
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -134,7 +129,7 @@ internal static class CameraToolHandlers
 		{
 			summary = $"{cameras.Count} camera(s) found.",
 			cameras
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── Schemas ─────────────────────────────────────────────────────────────

@@ -39,7 +39,7 @@ internal static class RpcDispatcher
 				{
 					protocolVersion = "2024-11-05",
 					capabilities    = new { tools = new { listChanged = true } },
-					serverInfo      = new { name = "SboxMcpServer", version = "1.3.0" }
+					serverInfo      = new { name = "SboxMcpServer", version = "1.4.0" }
 				};
 			}
 			else if ( method == "tools/list" )
@@ -211,7 +211,7 @@ internal static class RpcDispatcher
 
 				if ( toolNameCatch == "run_console_command" )
 				{
-					result = ToolHandlerBase.TextResult( $"Command failed: {cmdStrCatch}\nError: {ex.Message}" );
+					result = OzmiumSceneHelpers.Txt( $"Command failed: {cmdStrCatch}\nError: {ex.Message}" );
 					error  = null;
 				}
 				else
@@ -245,7 +245,7 @@ internal static class RpcDispatcher
 		}
 		catch ( Exception ex )
 		{
-			return ToolHandlerBase.TextResult( $"Command failed: {cmdStr}\nError: {ex.Message}" );
+			return OzmiumSceneHelpers.Txt( $"Command failed: {cmdStr}\nError: {ex.Message}" );
 		}
 	}
 }

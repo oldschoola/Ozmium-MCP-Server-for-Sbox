@@ -12,11 +12,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class BatchToolHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-	};
 
 	// ── batch_enable ───────────────────────────────────────────────────────
 
@@ -254,7 +249,7 @@ internal static class BatchToolHandlers
 				grid = new { countX, countY, countZ },
 				spacing = new { x = spacingX, y = spacingY, z = spacingZ },
 				created
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -312,7 +307,7 @@ internal static class BatchToolHandlers
 		};
 		if ( errors.Count > 0 ) result["errors"] = errors;
 
-		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( result, _json ) );
+		return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( result, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── batch_reparent ───────────────────────────────────────────────────

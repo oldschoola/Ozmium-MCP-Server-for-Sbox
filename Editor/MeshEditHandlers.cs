@@ -15,11 +15,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class MeshEditHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-	};
 
 	// ── create_block ─────────────────────────────────────────────────────────
 
@@ -144,7 +139,7 @@ internal static class MeshEditHandlers
 				faceCount = hFaces.Count,
 				vertexCount = hVertices.Length,
 				material = materialPath
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex )
 		{
@@ -197,7 +192,7 @@ internal static class MeshEditHandlers
 					gameObjectId = gameObject.Id.ToString(),
 					gameObjectName = gameObject.Name,
 					faceIndex = faceIndex
-				}, _json ) );
+				}, OzmiumSceneHelpers.JsonSettings ) );
 			}
 			else
 			{
@@ -214,7 +209,7 @@ internal static class MeshEditHandlers
 					message = $"Applied material '{materialPath}' to {count} faces",
 					gameObjectId = gameObject.Id.ToString(),
 					gameObjectName = gameObject.Name
-				}, _json ) );
+				}, OzmiumSceneHelpers.JsonSettings ) );
 			}
 		}
 		catch ( Exception ex )
@@ -285,7 +280,7 @@ internal static class MeshEditHandlers
 				uAxis = OzmiumSceneHelpers.V3( vAxisU ),
 				vAxis = OzmiumSceneHelpers.V3( vAxisV ),
 				scale = new { x = scaleU, y = scaleV }
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex )
 		{
@@ -335,7 +330,7 @@ internal static class MeshEditHandlers
 				gameObjectName = gameObject.Name,
 				vertexIndex = vertexIndex,
 				position = OzmiumSceneHelpers.V3( newPosition )
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex )
 		{
@@ -391,7 +386,7 @@ internal static class MeshEditHandlers
 				gameObjectName = gameObject.Name,
 				vertexIndex = vertexIndex,
 				color = new { r, g, b, a }
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex )
 		{
@@ -446,7 +441,7 @@ internal static class MeshEditHandlers
 				gameObjectName = gameObject.Name,
 				vertexIndex = vertexIndex,
 				blend = new { r, g, b, a }
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex )
 		{
@@ -513,7 +508,7 @@ internal static class MeshEditHandlers
 					maxs = OzmiumSceneHelpers.V3( bounds.Maxs )
 				},
 				faces = faceData
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex )
 		{

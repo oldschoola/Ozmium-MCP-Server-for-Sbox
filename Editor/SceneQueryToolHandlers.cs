@@ -12,11 +12,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class SceneQueryToolHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-	};
 
 	// ── ray ────────────────────────────────────────────────────────────────
 
@@ -61,7 +56,7 @@ internal static class SceneQueryToolHandlers
 					start = OzmiumSceneHelpers.V3( start ),
 					end   = OzmiumSceneHelpers.V3( end ),
 					distance = Vector3.DistanceBetween( start, end )
-				}, _json ) );
+				}, OzmiumSceneHelpers.JsonSettings ) );
 
 			return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new
 			{
@@ -80,7 +75,7 @@ internal static class SceneQueryToolHandlers
 				startedSolid  = result.StartedSolid,
 				tags          = result.Tags,
 				direction     = OzmiumSceneHelpers.V3( result.Direction )
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception e ) { return OzmiumSceneHelpers.Txt( $"Error: {e.Message}" ); }
 	}
@@ -125,7 +120,7 @@ internal static class SceneQueryToolHandlers
 					hit    = false,
 					radius = radius,
 					distance = Vector3.DistanceBetween( start, end )
-				}, _json ) );
+				}, OzmiumSceneHelpers.JsonSettings ) );
 
 			return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new
 			{
@@ -139,7 +134,7 @@ internal static class SceneQueryToolHandlers
 					: null,
 				surface       = result.Surface?.ResourceName,
 				startedSolid  = result.StartedSolid
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception e ) { return OzmiumSceneHelpers.Txt( $"Error: {e.Message}" ); }
 	}
@@ -186,7 +181,7 @@ internal static class SceneQueryToolHandlers
 					hit    = false,
 					size   = new { x = bsx, y = bsy, z = bsz },
 					distance = Vector3.DistanceBetween( start, end )
-				}, _json ) );
+				}, OzmiumSceneHelpers.JsonSettings ) );
 
 			return OzmiumSceneHelpers.Txt( JsonSerializer.Serialize( new
 			{
@@ -200,7 +195,7 @@ internal static class SceneQueryToolHandlers
 					: null,
 				surface       = result.Surface?.ResourceName,
 				startedSolid  = result.StartedSolid
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception e ) { return OzmiumSceneHelpers.Txt( $"Error: {e.Message}" ); }
 	}
@@ -234,7 +229,7 @@ internal static class SceneQueryToolHandlers
 				center = OzmiumSceneHelpers.V3( center ),
 				radius,
 				results
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception e ) { return OzmiumSceneHelpers.Txt( $"Error: {e.Message}" ); }
 	}
@@ -270,7 +265,7 @@ internal static class SceneQueryToolHandlers
 				center = OzmiumSceneHelpers.V3( center ),
 				size = new { x = hsx * 2, y = hsy * 2, z = hsz * 2 },
 				results
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception e ) { return OzmiumSceneHelpers.Txt( $"Error: {e.Message}" ); }
 	}
@@ -322,7 +317,7 @@ internal static class SceneQueryToolHandlers
 				queryXZ = new { x = wx, z = wz },
 				height = MathF.Round( heightWorldPos.y, 2 ),
 				worldPosition = new { x = MathF.Round( heightWorldPos.x, 2 ), y = MathF.Round( heightWorldPos.y, 2 ), z = MathF.Round( heightWorldPos.z, 2 ) }
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception exT ) { return OzmiumSceneHelpers.Txt( $"Error: {exT.Message}" ); }
 	}

@@ -11,11 +11,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class NavMeshToolHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-	};
 
 	// ── get_navmesh_status ─────────────────────────────────────────────────
 
@@ -39,7 +34,7 @@ internal static class NavMeshToolHandlers
 				agentRadius = navMesh.AgentRadius,
 				agentStepSize = navMesh.AgentStepSize,
 				agentMaxSlope = navMesh.AgentMaxSlope
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -71,7 +66,7 @@ internal static class NavMeshToolHandlers
 				agentRadius = navMesh.AgentRadius,
 				agentStepSize = navMesh.AgentStepSize,
 				agentMaxSlope = navMesh.AgentMaxSlope
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -129,7 +124,7 @@ internal static class NavMeshToolHandlers
 				message = "NavMesh tile generation started (async, bounded area).",
 				center = OzmiumSceneHelpers.V3( center ),
 				radius
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -179,7 +174,7 @@ internal static class NavMeshToolHandlers
 				agentStepSize = navMesh.AgentStepSize,
 				agentMaxSlope = navMesh.AgentMaxSlope,
 				notes = "Use configure_navmesh to change params, mark_dirty to rebuild, regenerate_area for bounded regen."
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}

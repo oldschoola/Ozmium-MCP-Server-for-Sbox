@@ -13,11 +13,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class MaterialToolHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-	};
 
 	// ── set_param ──────────────────────────────────────────────────────────
 
@@ -182,7 +177,7 @@ internal static class MaterialToolHandlers
 				name = mat.Name,
 				path = materialPath,
 				note = "Use set_param to override shader parameters on a copy. Common params: g_vColorTint (color), F_BASE_COLOR (color), F_ROUGHNESS (float), F_METALLIC (float)."
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}

@@ -12,11 +12,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class ZoneToolHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-	};
 
 	private static readonly string[] ValidZoneTypes = { "buy_zone", "safe_zone", "jail_area", "no_pvp", "spawn_zone", "no_build" };
 
@@ -67,7 +62,7 @@ internal static class ZoneToolHandlers
 				name = go.Name,
 				tags = OzmiumSceneHelpers.GetTags( go ),
 				position = OzmiumSceneHelpers.V3( go.WorldPosition )
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -112,7 +107,7 @@ internal static class ZoneToolHandlers
 				size = new { x = sizeX, y = sizeY, z = sizeZ },
 				isTrigger,
 				position = OzmiumSceneHelpers.V3( go.WorldPosition )
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -154,7 +149,7 @@ internal static class ZoneToolHandlers
 				size = new { x = sizeX, y = sizeY, z = sizeZ },
 				isTrigger,
 				enabled = go.Enabled
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -220,7 +215,7 @@ internal static class ZoneToolHandlers
 				sphereRadius = useSphere ? sphereRadius : (object)null,
 				tagged,
 				taggedObjects = taggedList
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -257,7 +252,7 @@ internal static class ZoneToolHandlers
 			summary = $"Found {zones.Count} zone(s).",
 			filter = string.IsNullOrEmpty( zoneType ) ? "all zones" : zoneType,
 			zones
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── remove_zone_tag ────────────────────────────────────────────────────
@@ -342,7 +337,7 @@ internal static class ZoneToolHandlers
 			zoneMarkers = zoneMarkers.Select( m => new { id = m.Id.ToString(), name = m.Name, position = OzmiumSceneHelpers.V3( m.WorldPosition ) } ).ToList(),
 			totalFound = allFound.Count,
 			objects = results
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── manage_zones (Omnibus) ─────────────────────────────────────────────

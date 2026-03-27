@@ -12,11 +12,6 @@ namespace SboxMcpServer;
 /// </summary>
 internal static class VisibilityToolHandlers
 {
-	private static readonly JsonSerializerOptions _json = new()
-	{
-		PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
-		DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-	};
 
 	/// <summary>Tracks culling boxes by their parent GameObject ID.</summary>
 	private static readonly Dictionary<Guid, (SceneCullingBox Box, string Name)> _cullingBoxes = new();
@@ -72,7 +67,7 @@ internal static class VisibilityToolHandlers
 				position = OzmiumSceneHelpers.V3( go.WorldPosition ),
 				size = new { x = sizeX, y = sizeY, z = sizeZ },
 				mode = cullMode.ToString()
-			}, _json ) );
+			}, OzmiumSceneHelpers.JsonSettings ) );
 		}
 		catch ( Exception ex ) { return OzmiumSceneHelpers.Txt( $"Error: {ex.Message}" ); }
 	}
@@ -133,7 +128,7 @@ internal static class VisibilityToolHandlers
 		{
 			summary = $"Tracking {_cullingBoxes.Count} culling box(es).",
 			cullingBoxes = list
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── set_editor_only ────────────────────────────────────────────────────
@@ -180,7 +175,7 @@ internal static class VisibilityToolHandlers
 		{
 			summary = $"Found {objects.Count} editor-only object(s).",
 			objects
-		}, _json ) );
+		}, OzmiumSceneHelpers.JsonSettings ) );
 	}
 
 	// ── hide_in_game ───────────────────────────────────────────────────────
