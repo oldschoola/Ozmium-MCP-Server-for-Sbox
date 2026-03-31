@@ -130,5 +130,14 @@ internal static class ToolDefinitions
 
 		// ── Scene data (omnibus) ─────────────────────────────────────────
 		SceneDataToolHandlers.SchemaManageSceneData,
+
+		// ── Prefab management (omnibus) ──────────────────────────────────
+		PrefabToolHandlers.SchemaManagePrefabs,
+
+		// ── Compilation management (omnibus) ─────────────────────────────
+		CompilationToolHandlers.SchemaManageCompilation,
+
+		// ── Asset management (omnibus) ───────────────────────────────────
+		AssetManagementToolHandlers.SchemaManageAssets,
 	};
 }

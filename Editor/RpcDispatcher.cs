@@ -167,6 +167,12 @@ internal static class RpcDispatcher
 						"configure_game_entities"    => GameEntityConfigToolHandlers.ConfigureGameEntities( args ),
 						// ── Scene data (omnibus) ─────────────────────────────────────
 						"manage_scene_data"          => SceneDataToolHandlers.ManageSceneData( args ),
+						// ── Prefab management (omnibus) ──────────────────────────────
+						"manage_prefabs"             => PrefabToolHandlers.ManagePrefabs( args ),
+						// ── Compilation management (omnibus) ─────────────────────────
+						"manage_compilation"         => CompilationToolHandlers.ManageCompilation( args ),
+						// ── Asset management (omnibus) ───────────────────────────────
+						"manage_assets"              => AssetManagementToolHandlers.ManageAssets( args ),
 						_                             => throw new InvalidOperationException( $"Tool '{toolName}' not found" )
 					};
 				}
